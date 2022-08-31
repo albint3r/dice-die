@@ -1,7 +1,8 @@
 # Imports
 import datetime as dt
 # DataBase
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 # Project Modules
 from database.database_game import DataBaseGame
 
@@ -18,7 +19,12 @@ class GameResult(db.base):
     p1_score = Column(Integer)
     p2_score = Column(Integer)
     win = Column(Integer)
+    winner_name = Column(String(40))
     total_turns = Column(Integer)
+    grid_result = relationship('GridsResult', backref='game_result', uselist=False)
+
+    def __repr__(self):
+        return f'GameResult=(id: {self.id}, p1_name: {self.p1_name}, p2_name: {self.p2_name}, win: {self.win}, winner_name: {self.winner_name})'
 
     def set_result_game(self, **kwargs):
         """Fill the Game Result Objet"""
@@ -27,6 +33,7 @@ class GameResult(db.base):
         self.p1_score = kwargs.get('p1_score')
         self.p2_score = kwargs.get('p2_score')
         self.win = kwargs.get('win')
+        self.winner_name = kwargs.get('winner_name')
         self.total_turns = kwargs.get('total_turns')
 
     def save(self):
@@ -41,58 +48,63 @@ class GridsResult(db.base):
     date = Column(DateTime, default=dt.datetime.utcnow())
     # Player 1
     # Col1
+    p1_row0_col1 = Column(Integer)
     p1_row1_col1 = Column(Integer)
     p1_row2_col1 = Column(Integer)
-    p1_row3_col1 = Column(Integer)
     # Col2
+    p1_row0_col2 = Column(Integer)
     p1_row1_col2 = Column(Integer)
     p1_row2_col2 = Column(Integer)
-    p1_row3_col2 = Column(Integer)
     # Col3
+    p1_row0_col3 = Column(Integer)
     p1_row1_col3 = Column(Integer)
     p1_row2_col3 = Column(Integer)
-    p1_row3_col3 = Column(Integer)
     # Player 2
     # Col1
+    p2_row0_col1 = Column(Integer)
     p2_row1_col1 = Column(Integer)
     p2_row2_col1 = Column(Integer)
-    p2_row3_col1 = Column(Integer)
     # Col2
+    p2_row0_col2 = Column(Integer)
     p2_row1_col2 = Column(Integer)
     p2_row2_col2 = Column(Integer)
-    p2_row3_col2 = Column(Integer)
     # Col3
+    p2_row0_col3 = Column(Integer)
     p2_row1_col3 = Column(Integer)
     p2_row2_col3 = Column(Integer)
-    p2_row3_col3 = Column(Integer)
+    match_id = Column(Integer, ForeignKey('gameresult.id'))
+
+    def __repr__(self):
+        return f'GridsResult(id: {self.id}, match_id: {self.match_id})'
 
     def set_result_grid(self, **kwargs):
         # Player 1
         # Col1
+        self.p1_row0_col1 = kwargs.get('p1_row0_col1')
         self.p1_row1_col1 = kwargs.get('p1_row1_col1')
         self.p1_row2_col1 = kwargs.get('p1_row2_col1')
-        self.p1_row3_col1 = kwargs.get('p1_row3_col1')
         # Col2
+        self.p1_row0_col2 = kwargs.get('p1_row0_col2')
         self.p1_row1_col2 = kwargs.get('p1_row1_col2')
         self.p1_row2_col2 = kwargs.get('p1_row2_col2')
-        self.p1_row3_col2 = kwargs.get('p1_row3_col2')
         # Col3
+        self.p1_row0_col3 = kwargs.get('p1_row0_col3')
         self.p1_row1_col3 = kwargs.get('p1_row1_col3')
         self.p1_row2_col3 = kwargs.get('p1_row2_col3')
-        self.p1_row3_col3 = kwargs.get('p1_row3_col3')
         # Player 2
         # Col1
+        self.p2_row0_col1 = kwargs.get('p2_row0_col1')
         self.p2_row1_col1 = kwargs.get('p2_row1_col1')
         self.p2_row2_col1 = kwargs.get('p2_row2_col1')
-        self.p2_row3_col1 = kwargs.get('p2_row3_col1')
         # Col2
+        self.p2_row0_col2 = kwargs.get('p2_row0_col2')
         self.p2_row1_col2 = kwargs.get('p2_row1_col2')
         self.p2_row2_col2 = kwargs.get('p2_row2_col2')
-        self.p2_row3_col2 = kwargs.get('p2_row3_col2')
         # Col3
+        self.p2_row0_col3 = kwargs.get('p2_row0_col3')
         self.p2_row1_col3 = kwargs.get('p2_row1_col3')
         self.p2_row2_col3 = kwargs.get('p2_row2_col3')
-        self.p2_row3_col3 = kwargs.get('p2_row3_col3')
+        self.match_id = kwargs.get('match_id')
 
     def save(self):
         db.session.add(self)
@@ -104,29 +116,33 @@ if __name__ == '__main__':
     db.base.metadata.create_all(db.engine)
     x = db.session.query(GameResult).all()
     y = db.session.query(GridsResult).all()
+    match = db.session.query(GameResult).get(1)
 
     for row in y:
+        print(row.id)
+        print(row.date)
+        print(row.p1_row0_col1)
         print(row.p1_row1_col1)
         print(row.p1_row2_col1)
-        print(row.p1_row3_col1)
 
+        print(row.p1_row0_col2)
         print(row.p1_row1_col2)
         print(row.p1_row2_col2)
-        print(row.p1_row3_col2)
 
+        print(row.p1_row0_col3)
         print(row.p1_row1_col3)
         print(row.p1_row2_col3)
-        print(row.p1_row3_col3)
         print('*************')
+        print(row.p2_row0_col1)
         print(row.p2_row1_col1)
         print(row.p2_row2_col1)
-        print(row.p2_row3_col1)
 
+        print(row.p2_row0_col2)
         print(row.p2_row1_col2)
         print(row.p2_row2_col2)
-        print(row.p2_row3_col2)
 
+        print(row.p2_row0_col3)
         print(row.p2_row1_col3)
         print(row.p2_row2_col3)
-        print(row.p2_row3_col3)
         print('*************')
+        print(row.match_id)
