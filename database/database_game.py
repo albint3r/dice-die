@@ -22,16 +22,10 @@ class DataBaseGame:
         self.create_session()
 
     def create_engine(self):
-        self.engine = create_engine(os.environ.get('DATABASE_URL') or self.ROOT_DB)
+        self.engine = create_engine(os.environ.get('DATABASE_URL_DICE') or self.ROOT_DB)
 
     def create_session(self):
         Session = sessionmaker(self.engine)
         self.session = Session()
 
 
-#
-# from database.database_game import DataBaseGame
-# from database.models import GameResult
-# g = GameResult(p1_name='Tobe')
-# db = DataBaseGame()
-# db.session.add(g)
