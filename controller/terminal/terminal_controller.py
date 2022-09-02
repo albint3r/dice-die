@@ -79,8 +79,9 @@ class TerminalController(AbstractController):
         # Win Menu
         self.model.select_winner()
         self.view.show_winner(self.model)
-        self.model.fill_na(self.model.p1)
-        self.model.fill_na(self.model.p2)
+        self.model.fill_missing_dice_results(self.model.p1)
+        self.model.fill_missing_dice_results(self.model.p2)
+
         self.model.save_game_result()
         self.model.save_game_grid()
 

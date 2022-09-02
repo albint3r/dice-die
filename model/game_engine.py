@@ -28,12 +28,31 @@ class GameModel:
         return False if current_player.is_grid_full() else True
 
     @staticmethod
-    def fill_na(player: Board, fill_value: int = 0):
+    def fill_missing_dice_results(player: Board, fill_value: int = 0):
         """Fill the NaN values with Zero"""
         for i in range(1, player.max_column_size + 1):
             if not player.is_column_full(i):
                 player.grid.get(i).append(fill_value)
-                GameModel.fill_na(player)
+                GameModel.fill_missing_dice_results(player)
+
+    @staticmethod
+    def copy_fill_missing(grid: dict, fill_value: int = 0):
+        """Create a Copy of the Player Grid and fill all the missing values.
+        This helps to display the grid result in the 2D version.
+        """
+        max_grid_range = 3
+        copy = grid.copy()
+        for i in range(1, max_grid_range + 1):
+            copy[i] = grid[i].copy()
+
+        for i in range(1, max_grid_range + 1):
+            col = copy.get(i)
+            total_missing_vals = max_grid_range - len(col)
+            if total_missing_vals:
+                for ii in range(total_missing_vals):
+                    col.append(fill_value)
+
+        return copy
 
     @staticmethod
     def prepare_board_to_show(player: Board, reverse: bool = False) -> zip | zip_longest:

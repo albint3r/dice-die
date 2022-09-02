@@ -8,10 +8,10 @@
 *********************************************************************
 # Tableros
 *********************************************************************
-- Crear methodo que cree una copia del diccionario grid para poder agregar zeros
-y posteriormente este sirva para mostrar los resultados en el tabler.
+- `Crear methodo que cree una copia del diccionario grid para poder agregar zeros
+y posteriormente este sirva para mostrar los resultados en el tabler.`
 
-- Agregar puntuacion en la parte superior del tabler
+- `Agregar puntuacion en la parte superior del tabler`
 
 - **Agregar efecto de cortada en el numero especifico** 
 
