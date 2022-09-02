@@ -3,7 +3,7 @@ import os
 # Hint Types
 from dataclasses import dataclass
 # Project Modules
-from view.abstract_view import AbstractView
+from view.terminal.abstract_view import AbstractView
 
 
 @dataclass

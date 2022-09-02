@@ -1,5 +1,4 @@
-from model.board import Board
-from controller.terminal_controller import TerminalController
+from controller.terminal.terminal_controller import TerminalController
 
 ctrl = TerminalController()
 

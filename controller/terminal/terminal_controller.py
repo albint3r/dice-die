@@ -2,11 +2,13 @@
 import re
 # Hint Type
 # Project Modules
-from controller.abstract_controller import AbstractController
-from view.terminal_view import TerminalView
+from controller.terminal.abstract_controller import AbstractController
+from view.terminal.terminal_view import TerminalView
 
 
 class TerminalController(AbstractController):
+
+
 
     def __init__(self):
         self.view = TerminalView()
@@ -45,11 +47,13 @@ class TerminalController(AbstractController):
                 view_msg()
 
     def play(self):
+        # Show leader board before start the game
         self.view.show_leader_board(self.model.score_match.get_leader_score())
-
+        # Select contenders names
         self.set_players_names()
+        # Define which player starts first
         players = self.model.select_player_start()
-
+        # Game Start loop
         while self.game_on:
             # Assign player turn
             current_player = players[self.turn]
@@ -64,14 +68,15 @@ class TerminalController(AbstractController):
             current_player.points_board.update_column_points(current_player.grid, self.target_column)
             current_player.points_board.update_total_score()
             # Opponent have the dice result in the same target Colum?
-            opponent = self.select_opponent(players)
+            opponent = self.model.select_opponent(players, self.turn)
             self.model.remove_and_update_opponent_board(opponent, self.target_column, current_player.dice.number)
             self.model.score_match.plus_one_total_turn()
             self.view.clear_console()
-            # Is Game Over?
-            self.is_game_over(current_player)
-            self.change_player_turn()
+            # Is Game Over or next player?
+            self.game_on = self.model.is_game_over(current_player)
+            self.turn = self.model.change_player_turn(self.turn)
 
+        # Win Menu
         self.model.select_winner()
         self.view.show_winner(self.model)
         self.model.fill_na(self.model.p1)

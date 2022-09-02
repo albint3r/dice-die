@@ -31,16 +31,5 @@ class AbstractController(ABC):
     def start_new_game(self):
         pass
 
-    def select_opponent(self, players: tuple):
-        """Select the Opponent of the current player"""
-        # if the turn is 0 select opponent is player 2, else opponent is player 1
-        return players[1] if not self.turn else players[0]
 
-    def is_game_over(self, current_player) -> None:
-        """Return True if the game is over"""
-        self.game_on = False if current_player.is_grid_full() else True
 
-    def change_player_turn(self) -> None:
-        """Change the player turn"""
-        # If is 1 select the player1 else select player2
-        self.turn = 0 if self.turn else 1

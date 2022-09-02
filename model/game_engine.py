@@ -17,6 +17,17 @@ class GameModel:
     winner_status: int | None = None
 
     @staticmethod
+    def change_player_turn(turn: int) -> int:
+        """Change the player turn"""
+        # If is 1 select the player1 else select player2
+        return 0 if turn else 1
+
+    @staticmethod
+    def is_game_over(current_player) -> bool:
+        """Return True if the game is over"""
+        return False if current_player.is_grid_full() else True
+
+    @staticmethod
     def fill_na(player: Board, fill_value: int = 0):
         """Fill the NaN values with Zero"""
         for i in range(1, player.max_column_size + 1):
@@ -112,6 +123,12 @@ class GameModel:
         coin_toss = random.randint(0, 1)
         return (self.p1, self.p2) if coin_toss else (self.p2, self.p1)
 
+    @staticmethod
+    def select_opponent(players: tuple, turn: int) -> Board:
+        """Select the Opponent of the current player"""
+        # if the turn is 0 opponent is player 2, else opponent is player 1
+        return players[1] if not turn else players[0]
+
     def select_winner(self) -> None:
         """Select the winner of the game by the high score."""
         if self.p1.points_board.total_points > self.p2.points_board.total_points:
@@ -121,20 +138,20 @@ class GameModel:
         else:
             self.winner_status = 2  # Tie
 
-    def save_game_result(self):
-
+    def save_game_result(self) -> None:
+        """Save the PointsBoar Game Result"""
         self.score_match.result_tb.set_result_game(p1_name=self.p1.player.name,
-                                                  p2_name=self.p2.player.name,
-                                                  p1_score=self.p1.points_board.total_points,
-                                                  p2_score=self.p2.points_board.total_points,
-                                                  win=self.winner_status,
-                                                  winner_name=self.p2.player.name if self.winner_status else self.p1.player.name,
-                                                  total_turns=self.score_match.total_turns)
+                                                   p2_name=self.p2.player.name,
+                                                   p1_score=self.p1.points_board.total_points,
+                                                   p2_score=self.p2.points_board.total_points,
+                                                   win=self.winner_status,
+                                                   winner_name=self.p2.player.name if self.winner_status else self.p1.player.name,
+                                                   total_turns=self.score_match.total_turns)
 
         self.score_match.result_tb.save()
 
-    def save_game_grid(self):
-
+    def save_game_grid(self) -> None:
+        """Save the Grid Boards of the match"""
         self.score_match.grid_tb.set_result_grid(
             # Player 1
             # Col1
