@@ -88,11 +88,11 @@ class GameController:
             # Boards
             self.boars_group.draw(self.screen)
             self.boars_group.update(self.screen,
-                                    self.model.copy_fill_missing(self.model.p1.grid),
-                                    self.model.copy_fill_missing(self.model.p2.grid),
+                                    self.model.copy_fill_missing(self.model.p1.grid, reverse=True),
+                                    self.model.copy_fill_missing(self.model.p2.grid, reverse=False),
                                     self.model.p1.points_board.points,
                                     self.model.p2.points_board.points,
-                                    removed_dices_player_event_fake,
+                                    self.model.get_removed_dices_player(echo=False),
                                     opponent,
                                     self.model.score_match.plus_one_total_turn)  # Update turns
 

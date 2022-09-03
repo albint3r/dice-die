@@ -45,7 +45,7 @@ class GameModel:
                 GameModel.fill_missing_dice_results(player)
 
     @staticmethod
-    def copy_fill_missing(grid: dict, fill_value: int = 0) -> dict:
+    def copy_fill_missing(grid: dict, reverse=False, fill_value: int = 0) -> dict:
         """Create a Copy of the Player Grid and fill all the missing values.
         This helps to display the grid result in the 2D version.
         """
@@ -62,6 +62,11 @@ class GameModel:
             if total_missing_vals:
                 for ii in range(total_missing_vals):
                     col.append(fill_value)
+
+        if reverse:
+            copy[1] = copy[1][::-1]
+            copy[2] = copy[2][::-1]
+            copy[3] = copy[3][::-1]
 
         return copy
 
@@ -262,5 +267,5 @@ class GameModel:
         num_missing = list(num_missing)[0] if num_missing else 0
         # Find index of the missing values if there are not 0
         if num_missing:
-            indexes_missing_num = [True if num == num_missing else False for i, num in enumerate(col_old_copy) ]
+            indexes_missing_num = [True if num == num_missing else False for i, num in enumerate(col_old_copy)]
             return indexes_missing_num

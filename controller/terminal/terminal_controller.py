@@ -75,8 +75,8 @@ class TerminalController(AbstractController):
             # Is Game Over or next player?
             self.game_on = self.model.is_game_over(current_player)
             self.turn = self.model.change_player_turn(self.turn)
-            removed_dices_index = self.model.get_removed_dices_player(True)  # This is used to test only
-
+            # removed_dices_index = self.model.get_removed_dices_player(echo=True)  # This is used to test only
+            self.model.copy_fill_missing(self.model.p1.grid, True)
 
         # Win Menu
         self.model.select_winner()

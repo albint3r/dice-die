@@ -8,6 +8,7 @@ class BoarGameView(pg.sprite.Sprite):
     RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
     GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
     SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
+    SLASH_SOUND = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\slash1_sound.mp3'
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
     FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
     BOARDS_SIZE = (600, 400)
@@ -44,7 +45,8 @@ class BoarGameView(pg.sprite.Sprite):
         self.grid_main: dict | None = None
         self.grid_points: dict | None = None
         self.col_image = pg.Surface(self.COL_SIZE)
-        self.slash_flag = 15  # 60 FPS X SEG = 3 SEG
+        self.slash_flag_img = 0  # 60 FPS X SEG = 3 SEG
+        self.slash_flag_sound = True
         self.removed_events: dict | None = None  # is a list that contain boolean indicators to remove dices
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
@@ -61,7 +63,7 @@ class BoarGameView(pg.sprite.Sprite):
         if self.color == 'Green':
             self.grid_points = points_p2
 
-    def assign_removed_events(self, removed_dices_player) -> None:
+    def assign_removed_events(self, removed_dices_player: dict) -> None:
         """Assign the removed dice evento to each board depends on the color
         This helps to identify where would be printed a X mark when a dice is destroyed
         """
@@ -71,15 +73,13 @@ class BoarGameView(pg.sprite.Sprite):
             if self.color == 'Green' and player == 2:
                 self.removed_events = events
 
-    def proces_removed_events(self):
+    def proces_removed_events(self, screen):
         """This method would activate the removed dice animation effect on the player board."""
-        for col, event in self.removed_events.items():
-            if event:
-                # TODO BY THE MOMENT THIS ONLY IDENTIFY THE ROW AN THE PLAYER BOARD EVENT
-                # I need to proces the action and set a timer duration
-                # print(self.color, self.removed_events)
-                pass
-            # print(self.color, self.removed_events)
+        if self.removed_events:
+            print(self.removed_events)
+            for col, event in self.removed_events.items():
+                if event:
+                    self.slash_flag_img = 6
 
     def set_grid_rects(self, screen, show: bool = False):
         """Set grid Rectangles By there type of color.
@@ -134,12 +134,20 @@ class BoarGameView(pg.sprite.Sprite):
             screen.blit(text, text_rect)
 
     def show_slash(self, screen, x: int, y: int):
-
-        if not self.slash_flag <= 0:
+        """Display slash animation"""
+        if self.slash_flag_img > 0:
+            if self.slash_flag_sound:  # This control that the slash sound only play once
+                slash_sound = pg.mixer.Sound(self.SLASH_SOUND)
+                slash_sound.play()
+                self.slash_flag_sound = False
+            # Show the slash image 7 frame
             slash_img = pg.transform.scale(pg.image.load(self.SLASH_IMG).convert_alpha(), (500, 500))
             slash_img_rect = slash_img.get_rect(center=(x, y))
             screen.blit(slash_img, slash_img_rect)
-            self.slash_flag -= 1
+            self.slash_flag_img -= 1
+
+        if self.slash_flag_img <= 0:
+            self.slash_flag_sound = True
 
     def validate_and_show_grid_numbers(self, screen, col_coordinates_list: tuple, grid: dict[list, list, list]):
         """Validate if the Column of the grid have values and display it.
@@ -208,7 +216,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.set_grid_rects(screen)
         self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
-        self.proces_removed_events()
+        self.proces_removed_events(screen)
         # Selection of dice position
         self.set_target_column()
         self.add_to_column()
