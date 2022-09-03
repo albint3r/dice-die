@@ -20,10 +20,19 @@ class BoarGameView(pg.sprite.Sprite):
             self.x, self.y = (600, 250)
             self.image = pg.transform.scale(pg.image.load(self.RED_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
+            # Col coordinates
+            self.col1_coor = ((430, 200), (430, 285), (430, 375))
+            self.col2_coor = ((600, 200), (600, 285), (600, 375))
+            self.col3_coor = ((770, 200), (770, 285), (770, 375))
+
         if board_color == 'Green':
             self.x, self.y = (600, 750)
             self.image = pg.transform.scale(pg.image.load(self.GREEN_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
+            # Col coordinates
+            self.col1_coor = ((430, 635), (430, 725), (430, 810))
+            self.col2_coor = ((600, 635), (600, 725), (600, 810))
+            self.col3_coor = ((770, 635), (770, 725), (770, 810))
 
         # Grid Invisible Blocks
         self.grid_rects: dict = dict()
@@ -31,6 +40,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.grid_points: dict | None = None
         self.col_image = pg.Surface(self.COL_SIZE)
         self.slash_flag = 15  # 60 FPS X SEG = 3 SEG
+        self.removed_events: dict | None = None  # is a list that contain boolean indicators to remove dices
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
@@ -45,6 +55,25 @@ class BoarGameView(pg.sprite.Sprite):
             self.grid_points = points_p1
         if self.color == 'Green':
             self.grid_points = points_p2
+
+    def assign_removed_events(self, removed_dices_player) -> None:
+        """Assign the removed dice evento to each board depends on the color
+        This helps to identify where would be printed a X mark when a dice is destroyed
+        """
+        for player, events in removed_dices_player.items():
+            if self.color == 'Red' and player == 1:
+                self.removed_events = events
+            if self.color == 'Green' and player == 2:
+                self.removed_events = events
+
+    def proces_removed_events(self):
+        """This method would activate the removed dice animation effect on the player board."""
+        for col, event in self.removed_events.items():
+            if event:
+                # TODO BY THE MOMENT THIS ONLY IDENTIFY THE ROW AN THE PLAYER BOARD EVENT
+                # I need to proces the action and set a timer duration
+                print(self.color, self.removed_events)
+            # print(self.color, self.removed_events)
 
     def set_grid_rects(self, screen, show: bool = False):
         """Set grid Rectangles By there type of color.
@@ -78,21 +107,15 @@ class BoarGameView(pg.sprite.Sprite):
         """
 
         if self.color == 'Red':
-            col1_coor = ((430, 200), (430, 285), (430, 375))
-            col2_coor = ((600, 200), (600, 285), (600, 375))
-            col3_coor = ((770, 200), (770, 285), (770, 375))
-            col_coordinates_list = (col1_coor, col2_coor, col3_coor)
+            col_coordinates_list = (self.col1_coor, self.col2_coor, self.col3_coor)
             self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
 
         if self.color == 'Green':
-            col1_coor = ((430, 635), (430, 725), (430, 810))
-            col2_coor = ((600, 635), (600, 725), (600, 810))
-            col3_coor = ((770, 635), (770, 725), (770, 810))
-            col_coordinates_list = (col1_coor, col2_coor, col3_coor)
+            col_coordinates_list = (self.col1_coor, self.col2_coor, self.col3_coor)
             self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
 
     def set_grid_points(self, screen, grid_point: dict):
-
+        """Validate the Board Color Player and Display it the Points Score of each player."""
         if self.color == 'Red':
             col_coordinates_lst = (430, 135), (600, 135), (770, 135)
 
@@ -107,7 +130,7 @@ class BoarGameView(pg.sprite.Sprite):
     def show_slash(self, screen, x: int, y: int):
 
         if not self.slash_flag <= 0:
-            slash_img = pg.transform.scale(pg.image.load(self.SLASH_IMG).convert_alpha(), (500,500))
+            slash_img = pg.transform.scale(pg.image.load(self.SLASH_IMG).convert_alpha(), (500, 500))
             slash_img_rect = slash_img.get_rect(center=(x, y))
             screen.blit(slash_img, slash_img_rect)
             self.slash_flag -= 1
@@ -123,18 +146,21 @@ class BoarGameView(pg.sprite.Sprite):
                     text_rect = text.get_rect(center=coordinate)
                     screen.blit(text, text_rect)
 
-    def mouse_coll(self):
+    def mouse_coll(self):  # TODO MOVE TO CONTROLS, I DONT KNOW HOW BUT THIS MUST BE IN OTHER CLASS
         right_click = pg.mouse.get_pressed()[0]  # index 0 is the right mouse button
         mouse_pos = pg.mouse.get_pos()
         for i, rect in enumerate(self.grid_rects.values(), start=1):
             if rect.collidepoint(mouse_pos) and right_click:
                 print(f'Click col {i} {self.color}')
 
-    def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict) -> None:
+    def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict,
+               removed_dices_player: dict) -> None:
         self.assign_grid_to_board_color(p1_grid, p2_grid)
         self.assign_points_to_board_color(p1_grid_point, p2_grid_point)
+        self.assign_removed_events(removed_dices_player)
         self.show_slash(screen, 600, 200)
         self.set_grid_rects(screen)
         self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
+        self.proces_removed_events()
         self.mouse_coll()

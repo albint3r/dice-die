@@ -27,10 +27,12 @@ boar_group.add(BoarGameView('Green'))
 p1_score_fake = 5
 p2_score_fake = 10
 turn_fake = 10
-grid1_fake = {1: [1, 2, 0], 2: [3, 0, 5], 3: [6, 8, 1]}
-grid2_fake = {1: [2, 2, 5], 2: [3, 6, 5], 3: [1, 2, 3]}
+grid1_fake = {1: [1, 2, 3], 2: [3, 7, 5], 3: [6, 2, 1]}
+grid2_fake = {1: [2, 2, 0], 2: [3, 6, 5], 3: [1, 2, 0]}
 grid1_points_fake = {1: 10, 2: 20, 3: 3}
 grid2_points_fake = {1: 0, 2: 10, 3: 3}
+removed_dices_player_event_fake = {1: {3: [False, True, False]}, 2: {3: None}}
+
 
 while active_game:
 
@@ -48,7 +50,8 @@ while active_game:
 
     # Boards
     boar_group.draw(screen)
-    boar_group.update(screen, grid1_fake, grid2_fake, grid1_points_fake, grid2_points_fake)
+    boar_group.update(screen, grid1_fake, grid2_fake, grid1_points_fake, grid2_points_fake,
+                      removed_dices_player_event_fake)
 
     # Update All Game
     pg.display.update()

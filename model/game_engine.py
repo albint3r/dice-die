@@ -246,29 +246,6 @@ class GameModel:
             print(f'**********************************')
         return detected_changes
 
-    # def set_last_turn_grids(self) -> None:
-    #     """Create a Tuple list with the Original Grid and the Copy
-    #     This would help to compare the changes between each state of the grid data.
-    #     For example, if the player destroy a number it would recognize which number was gone.
-    #     """
-    #     copy1 = self.copy_fill_missing(self.p1.grid)
-    #     copy2 = self.copy_fill_missing(self.p2.grid)
-    #     copies = (copy1, copy2)
-    #     if self.last_turn_grids:
-    #         last_copy1 = self.last_turn_grids[0]
-    #         last_copy2 = self.last_turn_grids[1]
-    #         # First check if the list inside is the same
-    #         # If is different we would explor more what kind of change had
-    #         for last_grid, copy in zip(self.last_turn_grids, copies):
-    #             for ii in range(1, 4):
-    #                 if not last_grid[ii] == copy[ii]:  # No changed register
-    #                     print('*******************')
-    #                     print(last_grid[ii])
-    #                     print(copy[ii])
-    #                     print(f'Player Cambio {ii}')
-    #
-    #     self.last_turn_grids = copy1, copy2
-
     @staticmethod
     def mark_removed_dices(col_new_copy, col_old_copy) -> list:
         """Mark with TRUE the removed dices in a Column opponent.
