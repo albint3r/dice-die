@@ -17,7 +17,7 @@ class GameModel:
     p2: Board = field(default_factory=Board)
     score_match: ScoreMatch = field(default_factory=ScoreMatch, repr=False)
     winner_status: int | None = None
-    last_turn_grids: list | None = None
+    last_turn_grids: list | None = None  # Is the last turn board grid result of both players.
     changes_state: dict | None = None
 
     def __post_init__(self):
@@ -149,9 +149,13 @@ class GameModel:
             opponent.points_board.update_total_score()
 
     def select_player_start(self) -> tuple[Board, Board]:
-        """Simulate a coin toss to select which player starts"""
+        """Simulate a coin toss to select which player starts
+        This change the is_turn attribute to True if the player start, but this only works in the 2D version.
+        """
         coin_toss = random.randint(0, 1)
-        return (self.p1, self.p2) if coin_toss else (self.p2, self.p1)
+        players_order = (self.p1, self.p2) if coin_toss else (self.p2, self.p1)
+        players_order[0].is_turn = True
+        return players_order
 
     @staticmethod
     def select_opponent(players: tuple, turn: int) -> Board:

@@ -12,7 +12,8 @@ class ScoreBarView(pg.sprite.Sprite):
     COLOR_GREEN_SHADOW = '#4D8F81'
     BAR_SPEED = 1
     BORDER_RADIUS = 5
-    FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
+    # FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
+    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\BebasNeue-Regular.ttf'
 
     def __init__(self, screen):
         super().__init__()
@@ -69,14 +70,14 @@ class ScoreBarView(pg.sprite.Sprite):
             self.red_bar_size = new_red_bar_size
 
     def set_turns_text(self, turn):
-        text = self.font.render(f'Turn: {turn}', False, 'White')
+        text = self.font.render(f'Turn: {turn}', False, 'Black')
         text_rect = text.get_rect(center=(self.X_POS, self.Y_POS - 30))
         self.screen.blit(text, text_rect)
 
     def set_timer_text(self):
         timer = pg.time.get_ticks() / 1000
         timer = dt.datetime.fromtimestamp(timer)
-        text = self.font.render(f'Time   {timer.minute} : {timer.second}', False, 'White')
+        text = self.font.render(f'Time   {timer.minute} : {timer.second}', False, 'Black')
         text_rect = text.get_rect(center=(self.X_POS, self.Y_POS + 35))
         self.screen.blit(text, text_rect)
 
@@ -84,8 +85,15 @@ class ScoreBarView(pg.sprite.Sprite):
         """"""
         total_points = p1_score + p2_score
         # Red Bar Player
-        p1_points_per = p1_score / total_points
-        p2_points_per = p2_score / total_points
+        try:
+            p1_points_per = p1_score / total_points
+        except ZeroDivisionError:
+            p1_points_per = 0
+        try:
+            p2_points_per = p2_score / total_points
+        except ZeroDivisionError:
+            p2_points_per = 0
+
         return p1_points_per, p2_points_per
 
     def set_players_score_per(self, p1_score: int, p2_score: int):

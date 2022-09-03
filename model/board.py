@@ -15,7 +15,7 @@ class Board:
     points_board: PointsBoard = field(default_factory=PointsBoard)
     player: Player = field(default_factory=Player)
     grid: dict = field(default_factory=dict)
-    is_turn: bool = field(default=False, repr=False)
+    is_turn: bool = field(default=False, repr=True)  # This only works in the 2D game
     _max_column_size: int = field(default=3, repr=False)
 
     def __post_init__(self):

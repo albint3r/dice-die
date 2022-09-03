@@ -6,17 +6,20 @@ class BoarGameView(pg.sprite.Sprite):
     RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
     GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
     SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
-    FONT_ROOT = r'../statics/font/Magical Story.ttf'
+    # FONT_ROOT = r'../statics/font/Magical Story.ttf'
+    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
     BOARDS_SIZE = (600, 400)
     COL_SIZE = (163, 247)
 
-    def __init__(self, board_color: str):
+    def __init__(self, board_color: str, player_board):
         super().__init__()
         self.color = board_color
+        self.player = player_board
         self.font = pg.font.Font(self.FONT_ROOT, 60)
         self.font_points = pg.font.Font(self.FONT_ROOT, 40)
+        self.target_column: int | None = None
 
-        if board_color == 'Red':
+        if board_color == 'Green':
             self.x, self.y = (600, 250)
             self.image = pg.transform.scale(pg.image.load(self.RED_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
@@ -25,7 +28,7 @@ class BoarGameView(pg.sprite.Sprite):
             self.col2_coor = ((600, 200), (600, 285), (600, 375))
             self.col3_coor = ((770, 200), (770, 285), (770, 375))
 
-        if board_color == 'Green':
+        if board_color == 'Red':
             self.x, self.y = (600, 750)
             self.image = pg.transform.scale(pg.image.load(self.GREEN_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
@@ -44,9 +47,9 @@ class BoarGameView(pg.sprite.Sprite):
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
-        if self.color == 'Red':
-            self.grid_main = grid_p1
         if self.color == 'Green':
+            self.grid_main = grid_p1
+        if self.color == 'Red':
             self.grid_main = grid_p2
 
     def assign_points_to_board_color(self, points_p1, points_p2):
@@ -72,7 +75,8 @@ class BoarGameView(pg.sprite.Sprite):
             if event:
                 # TODO BY THE MOMENT THIS ONLY IDENTIFY THE ROW AN THE PLAYER BOARD EVENT
                 # I need to proces the action and set a timer duration
-                print(self.color, self.removed_events)
+                # print(self.color, self.removed_events)
+                pass
             # print(self.color, self.removed_events)
 
     def set_grid_rects(self, screen, show: bool = False):
@@ -146,12 +150,39 @@ class BoarGameView(pg.sprite.Sprite):
                     text_rect = text.get_rect(center=coordinate)
                     screen.blit(text, text_rect)
 
-    def mouse_coll(self):  # TODO MOVE TO CONTROLS, I DONT KNOW HOW BUT THIS MUST BE IN OTHER CLASS
+    def set_target_column(self):  # TODO MOVE TO CONTROLS, I DONT KNOW HOW BUT THIS MUST BE IN OTHER CLASS
         right_click = pg.mouse.get_pressed()[0]  # index 0 is the right mouse button
         mouse_pos = pg.mouse.get_pos()
         for i, rect in enumerate(self.grid_rects.values(), start=1):
-            if rect.collidepoint(mouse_pos) and right_click:
-                print(f'Click col {i} {self.color}')
+            if rect.collidepoint(mouse_pos) and right_click and self.player.dice.number and not self.target_column:
+                # Select the dice position column
+                match i:
+                    case 1:
+                        self.target_column = 1
+                        print(f'The dice position {self.target_column}', self.player.player.name)
+                    case 2:
+                        self.target_column = 2
+                        print(f'The dice position {self.target_column}', self.player.player.name)
+                    case 3:
+                        self.target_column = 3
+                        print(f'The dice position {self.target_column}', self.player.player.name)
+
+    def add_to_column(self):
+        """Add the dice to the selected column"""
+        if self.player.is_turn and self.target_column:
+            self.player.add(self.target_column, self.player.dice.number)
+            print('grid', self.player.grid, self.player.player.name)
+
+    def update_points(self):
+        if self.player.is_turn and self.target_column:
+            self.player.points_board.update_column_points(self.player.grid, self.target_column)
+            self.player.points_board.update_total_score()
+            print('Points', self.player.points_board.points, self.player.player.name)
+
+    def update_turn(self):
+        if self.player.is_turn and self.target_column:
+            self.target_column = None
+            self.player.is_turn = False
 
     def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict,
                removed_dices_player: dict) -> None:
@@ -163,4 +194,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
         self.proces_removed_events()
-        self.mouse_coll()
+        self.set_target_column()
+        self.add_to_column()
+        self.update_points()
+        self.update_turn()
