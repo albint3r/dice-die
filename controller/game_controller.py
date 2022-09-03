@@ -58,8 +58,10 @@ class GameController:
         print(players[0])
 
         while self.active_game:
-            # Assign player turn
+            # Assign player turn and define opponent player in this turn
             current_player = players[self.turn]
+            opponent = self.model.select_opponent(players, self.turn)
+
             # print(current_player.grid)
             # Roll the dice
 
@@ -71,12 +73,17 @@ class GameController:
                 if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
+
+            # Dice
+            self.dice.draw(self.screen)
+            self.dice.update()
+
             # Score Bar
             self.score_bar.set_shadows()
             self.score_bar_group.draw(self.screen)
             self.score_bar_group.update(self.model.p1.points_board.total_points,
                                         self.model.p2.points_board.total_points,
-                                        turn_fake)
+                                        self.model.score_match.total_turns)
 
             # Boards
             self.boars_group.draw(self.screen)
@@ -85,11 +92,14 @@ class GameController:
                                     self.model.copy_fill_missing(self.model.p2.grid),
                                     self.model.p1.points_board.points,
                                     self.model.p2.points_board.points,
-                                    removed_dices_player_event_fake)
+                                    removed_dices_player_event_fake,
+                                    opponent,
+                                    self.model.score_match.plus_one_total_turn)  # Update turns
 
-            # Dice
-            self.dice.draw(self.screen)
-            self.dice.update()
+            # Player lose their turn?
+            # If the player not longer is their turn, activate change player turn.
+            if not current_player.is_turn:
+                self.turn = self.model.change_player_turn(self.turn)
 
             # Update All Game
             pg.display.update()

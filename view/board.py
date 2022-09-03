@@ -1,5 +1,7 @@
 # Import
 import pygame as pg
+# Model
+from model.game_engine import GameModel
 
 
 class BoarGameView(pg.sprite.Sprite):
@@ -19,7 +21,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.font_points = pg.font.Font(self.FONT_ROOT, 40)
         self.target_column: int | None = None
 
-        if board_color == 'Green':
+        if self.color == 'Red':
             self.x, self.y = (600, 250)
             self.image = pg.transform.scale(pg.image.load(self.RED_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
@@ -28,7 +30,7 @@ class BoarGameView(pg.sprite.Sprite):
             self.col2_coor = ((600, 200), (600, 285), (600, 375))
             self.col3_coor = ((770, 200), (770, 285), (770, 375))
 
-        if board_color == 'Red':
+        if self.color == 'Green':
             self.x, self.y = (600, 750)
             self.image = pg.transform.scale(pg.image.load(self.GREEN_BOARD_IMG_ROOT).convert_alpha(), self.BOARDS_SIZE)
             self.rect = self.image.get_rect(center=(self.x, self.y))
@@ -47,9 +49,9 @@ class BoarGameView(pg.sprite.Sprite):
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
-        if self.color == 'Green':
-            self.grid_main = grid_p1
         if self.color == 'Red':
+            self.grid_main = grid_p1
+        if self.color == 'Green':
             self.grid_main = grid_p2
 
     def assign_points_to_board_color(self, points_p1, points_p2):
@@ -174,18 +176,31 @@ class BoarGameView(pg.sprite.Sprite):
             print('grid', self.player.grid, self.player.player.name)
 
     def update_points(self):
+        """Change players turn, update values and reset to avoid errors."""
         if self.player.is_turn and self.target_column:
             self.player.points_board.update_column_points(self.player.grid, self.target_column)
             self.player.points_board.update_total_score()
             print('Points', self.player.points_board.points, self.player.player.name)
 
-    def update_turn(self):
+    def update_opponent_game(self, opponent):
+        """Update the game of the opponent player."""
+        if self.player.is_turn and self.target_column and self.player.dice.number:
+            GameModel.remove_and_update_opponent_board(opponent, self.target_column, self.player.dice.number)
+
+    def update_turn(self, func_update_total_score, opponent):
         if self.player.is_turn and self.target_column:
+            self.player.dice.number = None
             self.target_column = None
             self.player.is_turn = False
+            opponent.is_turn = True
+            print('current_player', self.player.player.name)
+            print('opponent', opponent.player.name)
+            # This make a call back to update the Turns in the game.
+            func_update_total_score()
 
     def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict,
-               removed_dices_player: dict) -> None:
+               removed_dices_player: dict, opponent, func_update_total_score) -> None:
+
         self.assign_grid_to_board_color(p1_grid, p2_grid)
         self.assign_points_to_board_color(p1_grid_point, p2_grid_point)
         self.assign_removed_events(removed_dices_player)
@@ -194,7 +209,9 @@ class BoarGameView(pg.sprite.Sprite):
         self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
         self.proces_removed_events()
+        # Selection of dice position
         self.set_target_column()
         self.add_to_column()
         self.update_points()
-        self.update_turn()
+        self.update_opponent_game(opponent)
+        self.update_turn(func_update_total_score, opponent)
