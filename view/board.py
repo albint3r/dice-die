@@ -5,6 +5,7 @@ import pygame as pg
 class BoarGameView(pg.sprite.Sprite):
     RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
     GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
+    SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
     FONT_ROOT = r'../statics/font/Magical Story.ttf'
     BOARDS_SIZE = (600, 400)
     COL_SIZE = (163, 247)
@@ -26,16 +27,17 @@ class BoarGameView(pg.sprite.Sprite):
 
         # Grid Invisible Blocks
         self.grid_rects: dict = dict()
-        self.grid_original: dict | None = None
+        self.grid_main: dict | None = None
         self.grid_points: dict | None = None
         self.col_image = pg.Surface(self.COL_SIZE)
+        self.slash_flag = 15  # 60 FPS X SEG = 3 SEG
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
         if self.color == 'Red':
-            self.grid_original = grid_p1
+            self.grid_main = grid_p1
         if self.color == 'Green':
-            self.grid_original = grid_p2
+            self.grid_main = grid_p2
 
     def assign_points_to_board_color(self, points_p1, points_p2):
         """Assign the Grid Board of the player depends on the color"""
@@ -102,6 +104,14 @@ class BoarGameView(pg.sprite.Sprite):
             text_rect = text.get_rect(center=col)
             screen.blit(text, text_rect)
 
+    def show_slash(self, screen, x: int, y: int):
+
+        if not self.slash_flag <= 0:
+            slash_img = pg.transform.scale(pg.image.load(self.SLASH_IMG).convert_alpha(), (500,500))
+            slash_img_rect = slash_img.get_rect(center=(x, y))
+            screen.blit(slash_img, slash_img_rect)
+            self.slash_flag -= 1
+
     def validate_and_show_grid_numbers(self, screen, col_coordinates_list: tuple, grid: dict[list, list, list]):
         """Validate if the Column of the grid have values and display it.
         This method assume that the grid was prepared with the copy and fill method of the Game engine class.
@@ -123,7 +133,8 @@ class BoarGameView(pg.sprite.Sprite):
     def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict) -> None:
         self.assign_grid_to_board_color(p1_grid, p2_grid)
         self.assign_points_to_board_color(p1_grid_point, p2_grid_point)
+        self.show_slash(screen, 600, 200)
         self.set_grid_rects(screen)
-        self.set_grid_numbers(screen, self.grid_original)
+        self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
         self.mouse_coll()

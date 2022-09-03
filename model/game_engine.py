@@ -3,6 +3,8 @@ import random
 from itertools import zip_longest
 # Hint Type
 from dataclasses import dataclass, field
+from typing import Any, Generator
+
 # Project Modules
 from model.board import Board
 from model.score import ScoreMatch
@@ -15,6 +17,13 @@ class GameModel:
     p2: Board = field(default_factory=Board)
     score_match: ScoreMatch = field(default_factory=ScoreMatch, repr=False)
     winner_status: int | None = None
+    last_turn_grids: list | None = None
+    changes_state: dict | None = None
+
+    def __post_init__(self):
+        # Init a last
+        self.last_turn_grids = [{1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0]},  # P1
+                                {1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0]}]  # P2
 
     @staticmethod
     def change_player_turn(turn: int) -> int:
@@ -36,15 +45,17 @@ class GameModel:
                 GameModel.fill_missing_dice_results(player)
 
     @staticmethod
-    def copy_fill_missing(grid: dict, fill_value: int = 0):
+    def copy_fill_missing(grid: dict, fill_value: int = 0) -> dict:
         """Create a Copy of the Player Grid and fill all the missing values.
         This helps to display the grid result in the 2D version.
         """
         max_grid_range = 3
+        # Copy new dict to avoid errors
         copy = grid.copy()
+        # Copy all the List to avoid errors
         for i in range(1, max_grid_range + 1):
             copy[i] = grid[i].copy()
-
+        # Fill missing values
         for i in range(1, max_grid_range + 1):
             col = copy.get(i)
             total_missing_vals = max_grid_range - len(col)
@@ -202,3 +213,73 @@ class GameModel:
         )
 
         self.score_match.grid_tb.save()
+
+    def create_last_turn_grids(self) -> list:
+        return [self.copy_fill_missing(grid) for grid in (self.p1.grid, self.p2.grid)]
+
+    def get_removed_dices_player(self, echo: bool = False) -> dict:
+        # Validate if exist the last turn grid
+        detected_changes = {1: None, 2: None}
+        new_copies = self.create_last_turn_grids()
+        player_counter = 1  # This helps to organize the order of the players changes.
+        if self.last_turn_grids:
+            # Extract the game of player 1 and 2, and check each column for changes.
+            for old_copy, new_copy in zip(self.last_turn_grids, new_copies):
+                # Select by index each column
+                for i in range(1, 4):
+                    # Check Tru if note changes between the new and the old copy.
+                    if not old_copy[i] == new_copy[i]:
+                        # Leave this prints to watch all the proces
+                        if echo:
+                            print(f'\n**** Player {player_counter} ********')
+                            print('old', old_copy[i])
+                            print('new', new_copy[i])
+                        changes_list = self.mark_removed_dices(new_copy[i], old_copy[i])
+                        detected_changes[player_counter] = {i: changes_list}
+
+                player_counter += 1  # Change player
+
+        # Assign values
+        self.last_turn_grids = new_copies
+        if echo:
+            print(detected_changes)
+            print(f'**********************************')
+        return detected_changes
+
+    # def set_last_turn_grids(self) -> None:
+    #     """Create a Tuple list with the Original Grid and the Copy
+    #     This would help to compare the changes between each state of the grid data.
+    #     For example, if the player destroy a number it would recognize which number was gone.
+    #     """
+    #     copy1 = self.copy_fill_missing(self.p1.grid)
+    #     copy2 = self.copy_fill_missing(self.p2.grid)
+    #     copies = (copy1, copy2)
+    #     if self.last_turn_grids:
+    #         last_copy1 = self.last_turn_grids[0]
+    #         last_copy2 = self.last_turn_grids[1]
+    #         # First check if the list inside is the same
+    #         # If is different we would explor more what kind of change had
+    #         for last_grid, copy in zip(self.last_turn_grids, copies):
+    #             for ii in range(1, 4):
+    #                 if not last_grid[ii] == copy[ii]:  # No changed register
+    #                     print('*******************')
+    #                     print(last_grid[ii])
+    #                     print(copy[ii])
+    #                     print(f'Player Cambio {ii}')
+    #
+    #     self.last_turn_grids = copy1, copy2
+
+    @staticmethod
+    def mark_removed_dices(col_new_copy, col_old_copy) -> list:
+        """Mark with TRUE the removed dices in a Column opponent.
+        This is a True/False list in the same index order of the target Column.
+        This would help to iterate on each boolean and apply an animation when the dice is destroyed.
+        """
+
+        # Check the differences and select the only number that expect the game.
+        num_missing = set(col_old_copy).difference(set(col_new_copy))
+        num_missing = list(num_missing)[0] if num_missing else 0
+        # Find index of the missing values if there are not 0
+        if num_missing:
+            indexes_missing_num = [True if num == num_missing else False for i, num in enumerate(col_old_copy) ]
+            return indexes_missing_num
