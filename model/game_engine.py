@@ -229,8 +229,8 @@ class GameModel:
         Also, is important tha the firs player have a reverse grid, because the game
         display a mirror view to play
         """
-        return [self.copy_fill_missing(grid, reverse) for reverse,  grid in zip((True, False), (self.p1.grid, self.p2.grid))]
-
+        return [self.copy_fill_missing(grid, reverse) for reverse, grid in
+                zip((True, False), (self.p1.grid, self.p2.grid))]
 
     def get_removed_dices_player(self, echo: bool = False) -> dict:
         # Validate if exist the last turn grid

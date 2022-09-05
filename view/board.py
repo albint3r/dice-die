@@ -11,6 +11,10 @@ class BoarGameView(pg.sprite.Sprite):
     RED_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
     BLUE_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash2.png'
     SLASH_SOUND = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\slash1_sound.mp3'
+    # Damage
+    BROKEN1_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken1.png'
+    BROKEN2_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken2.png'
+    BROKEN3_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken3.png'
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
     FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
     BOARDS_SIZE = (600, 400)
@@ -18,6 +22,7 @@ class BoarGameView(pg.sprite.Sprite):
 
     def __init__(self, board_color: str, player_board):
         super().__init__()
+        self.screen_main = pg.display.get_surface()
         self.color = board_color
         self.player = player_board
         self.font = pg.font.Font(self.FONT_ROOT, 60)
@@ -53,8 +58,11 @@ class BoarGameView(pg.sprite.Sprite):
         # This is the col targe
         self.removed_events_location_coordinates_all: tuple | None = None
         self.coordinates_to_slash: list[tuple] = list()
-        self.cooldown_slash: int = 15
+        self.cooldown_slash: int = 3
         self.slash_sound_action: bool = True
+        # Board Damage
+        self.damages_img_lst: list = list()
+        self.damages_rects_lst: list = list()
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
@@ -135,7 +143,7 @@ class BoarGameView(pg.sprite.Sprite):
             for key, val in self.grid_rects.items():
                 pg.draw.rect(screen, 'White', val)
 
-    def set_grid_numbers(self, screen, grid: dict[list, list, list]) -> None:
+    def show_grid_numbers(self, screen, grid: dict[list, list, list]) -> None:
         """Display the Numbers on the grid by there type of color
 
         Parameters:
@@ -153,7 +161,7 @@ class BoarGameView(pg.sprite.Sprite):
     def get_grid_coordinates(self) -> tuple:
         return self.col1_coor, self.col2_coor, self.col3_coor
 
-    def set_grid_points(self, screen, grid_point: dict):
+    def show_grid_points(self, screen, grid_point: dict):
         """Validate the Board Color Player and Display it the Points Score of each player."""
         if self.color == 'Red':
             col_coordinates_lst = (430, 135), (600, 135), (770, 135)
@@ -166,28 +174,31 @@ class BoarGameView(pg.sprite.Sprite):
             text_rect = text.get_rect(center=col)
             screen.blit(text, text_rect)
 
-    def show_slash(self, screen):
-        """Display slash animation"""
+    def show_slash(self):
+        """Display slash animation
+        Only run if it had a coordinate in the list. After run N times (cooldown slash) it will
+        pop the coordinate and this will return False. But if it had another coordinate it will display it to.
+        """
         if self.coordinates_to_slash and self.cooldown_slash:
-            # Show the slash image 7 frame
-
+            # Show the slash image 3 frame
             # Active the slash sound one time
             # After activate the sound it deactivate
             if self.slash_sound_action:
                 slash_sound = pg.mixer.Sound(self.SLASH_SOUND)
                 slash_sound.play()
                 self.slash_sound_action = False
+                self.add_broken()
             # Create Slash image
             slash_img = pg.transform.scale(pg.image.load(self.RED_SLASH_IMG).convert_alpha(), (500, 500))
             slash_img_rect = slash_img.get_rect(center=self.coordinates_to_slash[0])
-            screen.blit(slash_img, slash_img_rect)
+            self.screen_main.blit(slash_img, slash_img_rect)
             # Set the time duration of the slash image
             self.cooldown_slash -= 1
             # If the time duration is 0 it will remove the coordinates of the slash target
             # Reset the cooldown duration and activate again the sound for the next animation.
             if not self.cooldown_slash:
                 self.coordinates_to_slash.pop(0)
-                self.cooldown_slash = 8
+                self.cooldown_slash = 3
                 self.slash_sound_action = True
 
     def validate_and_show_grid_numbers(self, screen, col_coordinates_list: tuple, grid: dict[list, list, list]):
@@ -224,6 +235,32 @@ class BoarGameView(pg.sprite.Sprite):
             self.player.add(self.target_column, self.player.dice.number)
             print('grid', self.player.grid, self.player.player.name)
 
+    def add_broken(self):
+        """Create a broken objet to display in front of the board to create the ilution of damage"""
+        if self.color == 'Red':
+            x_range = random.randint(350, 820)
+            y_range = random.randint(150, 370)
+
+        if self.color == 'Green':
+            x_range = random.randint(350, 820)
+            y_range = random.randint(600, 800)
+
+        # Select a random Broken image to display. This have a 66% of be a small broke, an 33% of a big broken
+        random_img = random.choice([self.BROKEN2_IMG, self.BROKEN2_IMG, self.BROKEN1_IMG])
+
+        angle_rotation = random.randint(0, 360)  # Rotate randomly the image to create the sensation o variety
+        image = pg.transform.rotate(pg.transform.scale(pg.image.load(random_img).convert_alpha(), (40, 40)),
+                                    angle_rotation)
+        image_rect = self.image.get_rect(topleft=(x_range, y_range))
+        self.damages_img_lst.append(image)
+        self.damages_rects_lst.append(image_rect)
+
+    def show_damage(self):
+        """Display the damage image in front of the board player"""
+        if self.damages_img_lst and self.damages_rects_lst:
+            for image, damage in zip(self.damages_img_lst, self.damages_rects_lst):
+                self.screen_main.blit(image, damage)
+
     def update_points(self):
         """Change players turn, update values and reset to avoid errors."""
         if self.player.is_turn and self.target_column:
@@ -255,11 +292,12 @@ class BoarGameView(pg.sprite.Sprite):
         self.assign_removed_events(removed_dices_player)
         # Design
         self.set_grid_rects(screen)
-        self.set_grid_numbers(screen, self.grid_main)
-        self.set_grid_points(screen, self.grid_points)
+        self.show_damage()
+        self.show_grid_numbers(screen, self.grid_main)
+        self.show_grid_points(screen, self.grid_points)
+        self.show_slash()
         # Slash events
         self.proces_removed_events()
-        self.show_slash(screen)
         # Selection of dice position
         self.set_target_column()
         self.add_to_column()
