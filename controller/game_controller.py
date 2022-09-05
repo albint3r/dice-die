@@ -97,7 +97,7 @@ class GameController:
                                     self.model.score_match.plus_one_total_turn)  # Update turns
 
             # Player lose their turn?
-            # If the player not longer is their turn, activate change player turn.
+            # If not longer their player turn, activate change player turn.
             if not current_player.is_turn:
                 self.turn = self.model.change_player_turn(self.turn)
 

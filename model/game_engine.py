@@ -224,7 +224,13 @@ class GameModel:
         self.score_match.grid_tb.save()
 
     def create_last_turn_grids(self) -> list:
-        return [self.copy_fill_missing(grid) for grid in (self.p1.grid, self.p2.grid)]
+        """Create a players grid Copy filling the missing values.
+        This helps to identify changes in the game to display the X mark in the 2D game.
+        Also, is important tha the firs player have a reverse grid, because the game
+        display a mirror view to play
+        """
+        return [self.copy_fill_missing(grid, reverse) for reverse,  grid in zip((True, False), (self.p1.grid, self.p2.grid))]
+
 
     def get_removed_dices_player(self, echo: bool = False) -> dict:
         # Validate if exist the last turn grid
@@ -238,7 +244,7 @@ class GameModel:
                 for i in range(1, 4):
                     # Check Tru if note changes between the new and the old copy.
                     if not old_copy[i] == new_copy[i]:
-                        # Leave this prints to watch all the proces
+                        # Leave this prints to watch all the process
                         if echo:
                             print(f'\n**** Player {player_counter} ********')
                             print('old', old_copy[i])

@@ -1,5 +1,6 @@
 # Import
 import pygame as pg
+import random
 # Model
 from model.game_engine import GameModel
 
@@ -7,7 +8,8 @@ from model.game_engine import GameModel
 class BoarGameView(pg.sprite.Sprite):
     RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
     GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
-    SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
+    RED_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
+    BLUE_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash2.png'
     SLASH_SOUND = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\slash1_sound.mp3'
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
     FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
@@ -40,14 +42,19 @@ class BoarGameView(pg.sprite.Sprite):
             self.col2_coor = ((600, 635), (600, 725), (600, 810))
             self.col3_coor = ((770, 635), (770, 725), (770, 810))
 
+        self.dic_coor = {1: self.col1_coor, 2: self.col2_coor, 3: self.col3_coor}
+
         # Grid Invisible Blocks
         self.grid_rects: dict = dict()
         self.grid_main: dict | None = None
         self.grid_points: dict | None = None
         self.col_image = pg.Surface(self.COL_SIZE)
-        self.slash_flag_img = 0  # 60 FPS X SEG = 3 SEG
-        self.slash_flag_sound = True
         self.removed_events: dict | None = None  # is a list that contain boolean indicators to remove dices
+        # This is the col targe
+        self.removed_events_location_coordinates_all: tuple | None = None
+        self.coordinates_to_slash: list[tuple] = list()
+        self.cooldown_slash: int = 15
+        self.slash_sound_action: bool = True
 
     def assign_grid_to_board_color(self, grid_p1, grid_p2):
         """Assign the Grid Board of the player depends on the color"""
@@ -67,19 +74,48 @@ class BoarGameView(pg.sprite.Sprite):
         """Assign the removed dice evento to each board depends on the color
         This helps to identify where would be printed a X mark when a dice is destroyed
         """
-        for player, events in removed_dices_player.items():
-            if self.color == 'Red' and player == 1:
-                self.removed_events = events
-            if self.color == 'Green' and player == 2:
-                self.removed_events = events
 
-    def proces_removed_events(self, screen):
+        # {1: None}
+        # {1: [True, False, False]}
+        for player, removed_events in removed_dices_player.items():
+            if self.color == 'Red' and player == 1:
+                self.removed_events = removed_events
+
+            if self.color == 'Green' and player == 2:
+                self.removed_events = removed_events
+
+    def get_remove_coordinates(self, targe_column: int):
+        """Return the list of tuples with the coordinates of the B"""
+        return self.dic_coor.get(targe_column)
+
+    def proces_removed_events(self):
         """This method would activate the removed dice animation effect on the player board."""
-        if self.removed_events:
-            print(self.removed_events)
-            for col, event in self.removed_events.items():
-                if event:
-                    self.slash_flag_img = 6
+
+        # Validate if exist events and if the event is Not None
+        # The events must be a list -> [True, True, False]  or None
+        if self.removed_events and list(self.removed_events.values())[0]:
+
+            # This is an integer to extract the column tuple
+            column_event_index = list(self.removed_events.keys())[0]
+            removed_events_bool_list = list(self.removed_events.values())[0]
+            # Assign the only one column with the True false target location.
+            self.removed_events_location_coordinates_all = self.dic_coor.get(column_event_index)
+
+            # Create a single list of tuples, with the specific location target.
+            # Example:
+            # ******************************************************************************
+            # [True, True, False]  -> Because there is 2 true
+            # [(430, 635), (770, 635)]  -> The result list only have 2 values inside
+            # ******************************************************************************
+            # Execute an if else statement to identify only the index with the true values
+            # This helps to select only the tuple COORDINATES in the same location.
+            # This would be iterated to display the X slash in the coordinates target
+            if removed_events_bool_list[0]:
+                self.coordinates_to_slash.append(self.removed_events_location_coordinates_all[0])
+            if removed_events_bool_list[1]:
+                self.coordinates_to_slash.append(self.removed_events_location_coordinates_all[1])
+            if removed_events_bool_list[2]:
+                self.coordinates_to_slash.append(self.removed_events_location_coordinates_all[2])
 
     def set_grid_rects(self, screen, show: bool = False):
         """Set grid Rectangles By there type of color.
@@ -111,14 +147,11 @@ class BoarGameView(pg.sprite.Sprite):
             to fill the missing spaces with 0.
             If is not zero in the grid passing to this method it would have error.
         """
+        col_coordinates_list = self.get_grid_coordinates()
+        self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
 
-        if self.color == 'Red':
-            col_coordinates_list = (self.col1_coor, self.col2_coor, self.col3_coor)
-            self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
-
-        if self.color == 'Green':
-            col_coordinates_list = (self.col1_coor, self.col2_coor, self.col3_coor)
-            self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
+    def get_grid_coordinates(self) -> tuple:
+        return self.col1_coor, self.col2_coor, self.col3_coor
 
     def set_grid_points(self, screen, grid_point: dict):
         """Validate the Board Color Player and Display it the Points Score of each player."""
@@ -133,21 +166,29 @@ class BoarGameView(pg.sprite.Sprite):
             text_rect = text.get_rect(center=col)
             screen.blit(text, text_rect)
 
-    def show_slash(self, screen, x: int, y: int):
+    def show_slash(self, screen):
         """Display slash animation"""
-        if self.slash_flag_img > 0:
-            if self.slash_flag_sound:  # This control that the slash sound only play once
+        if self.coordinates_to_slash and self.cooldown_slash:
+            # Show the slash image 7 frame
+
+            # Active the slash sound one time
+            # After activate the sound it deactivate
+            if self.slash_sound_action:
                 slash_sound = pg.mixer.Sound(self.SLASH_SOUND)
                 slash_sound.play()
-                self.slash_flag_sound = False
-            # Show the slash image 7 frame
-            slash_img = pg.transform.scale(pg.image.load(self.SLASH_IMG).convert_alpha(), (500, 500))
-            slash_img_rect = slash_img.get_rect(center=(x, y))
+                self.slash_sound_action = False
+            # Create Slash image
+            slash_img = pg.transform.scale(pg.image.load(self.RED_SLASH_IMG).convert_alpha(), (500, 500))
+            slash_img_rect = slash_img.get_rect(center=self.coordinates_to_slash[0])
             screen.blit(slash_img, slash_img_rect)
-            self.slash_flag_img -= 1
-
-        if self.slash_flag_img <= 0:
-            self.slash_flag_sound = True
+            # Set the time duration of the slash image
+            self.cooldown_slash -= 1
+            # If the time duration is 0 it will remove the coordinates of the slash target
+            # Reset the cooldown duration and activate again the sound for the next animation.
+            if not self.cooldown_slash:
+                self.coordinates_to_slash.pop(0)
+                self.cooldown_slash = 8
+                self.slash_sound_action = True
 
     def validate_and_show_grid_numbers(self, screen, col_coordinates_list: tuple, grid: dict[list, list, list]):
         """Validate if the Column of the grid have values and display it.
@@ -206,17 +247,19 @@ class BoarGameView(pg.sprite.Sprite):
             # This make a call back to update the Turns in the game.
             func_update_total_score()
 
-    def update(self, screen, p1_grid: dict, p2_grid: dict, p1_grid_point: dict, p2_grid_point: dict,
+    def update(self, screen, p1_grid_copy: dict, p2_grid_copy: dict, p1_grid_point: dict, p2_grid_point: dict,
                removed_dices_player: dict, opponent, func_update_total_score) -> None:
 
-        self.assign_grid_to_board_color(p1_grid, p2_grid)
+        self.assign_grid_to_board_color(p1_grid_copy, p2_grid_copy)
         self.assign_points_to_board_color(p1_grid_point, p2_grid_point)
         self.assign_removed_events(removed_dices_player)
-        self.show_slash(screen, 600, 200)
+        # Design
         self.set_grid_rects(screen)
         self.set_grid_numbers(screen, self.grid_main)
         self.set_grid_points(screen, self.grid_points)
-        self.proces_removed_events(screen)
+        # Slash events
+        self.proces_removed_events()
+        self.show_slash(screen)
         # Selection of dice position
         self.set_target_column()
         self.add_to_column()

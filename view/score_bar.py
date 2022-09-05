@@ -10,7 +10,7 @@ class ScoreBarView(pg.sprite.Sprite):
     COLOR_GREEN = '#78BD91'
     COLOR_RED_SHADOW = '#BB314F'
     COLOR_GREEN_SHADOW = '#4D8F81'
-    BAR_SPEED = 1
+    BAR_SPEED = 5
     BORDER_RADIUS = 5
     # FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
     FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\BebasNeue-Regular.ttf'
@@ -62,10 +62,11 @@ class ScoreBarView(pg.sprite.Sprite):
     def update_bar_size(self, p1_score: int, p2_score: int):
         """Update the size frame by frame of the Red Bar Size"""
         new_red_bar_size = self.calculate_bar_per(p1_score, p2_score)
-        if new_red_bar_size > self.red_bar_size:
-            self.red_bar_size += self.BAR_SPEED
-        elif new_red_bar_size < self.red_bar_size:
+
+        if self.red_bar_size > new_red_bar_size and self.red_bar_size > new_red_bar_size + self.BAR_SPEED:
             self.red_bar_size -= self.BAR_SPEED
+        elif self.red_bar_size < new_red_bar_size and self.red_bar_size < new_red_bar_size - self.BAR_SPEED:
+            self.red_bar_size += self.BAR_SPEED
         else:
             self.red_bar_size = new_red_bar_size
 
