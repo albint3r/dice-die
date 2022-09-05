@@ -16,6 +16,8 @@ class DiceView(pg.sprite.Sprite):
     DICE_ROLL_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\dice_roll.mp3'
     DICE_SIZE = (150, 150)
     TIME_SOUND_DELAY = 1500  # 0.5 seconds
+    TIME_ROLLING = 580
+    TIME_FLIP_DICE = 10
 
     def __init__(self, color: str, player_board):
         super().__init__()
@@ -26,8 +28,8 @@ class DiceView(pg.sprite.Sprite):
             self.rect = self.image.get_rect(center=(1000, 770))
         if self.color == 'Red':
             self.rect = self.image.get_rect(center=(190, 230))
-        self.animation_random_rolling_duration = 60  # is the time to the next dice img
-        self.rolling_duration = 900  # Is the time to throw the dice automatic
+        self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # is the time to the next dice img
+        self.rolling_duration = self.TIME_ROLLING  # Is the time to throw the dice automatic
         self.random_rolling_sound = pg.mixer.Sound(self.RANDOM_ROLLING_ROOT)
         self.roll_sound = pg.mixer.Sound(self.DICE_ROLL_ROOT)
         self.random_rolling_sound_flag = True  # If True the rolling dice will reproduce one time
@@ -44,7 +46,7 @@ class DiceView(pg.sprite.Sprite):
                 random_number = random.randint(1, 6)
                 # It selects a random image to create the rolling effect
                 self.image = pg.transform.scale(pg.image.load(self.DICE_IMG.get(random_number)), self.DICE_SIZE)
-                self.animation_random_rolling_duration = 60  # Reset Animation Duration
+                self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # Reset Animation Duration
                 if self.random_rolling_sound_flag:  # This play once the sound
                     self.random_rolling_sound.play()
                     self.random_rolling_sound_flag = False
@@ -56,8 +58,8 @@ class DiceView(pg.sprite.Sprite):
                 self.roll_sound.play()
                 print(f'Resultado {self.player.dice.number}', self.player.player.name)
                 self.random_rolling_sound_flag = True  # Turn on this flag for the next turn apply the effect
-                self.rolling_duration = 900  # Reset Timer Random Rolling Sound effect
-                self.animation_random_rolling_duration = 60  # Reset Animation Duration
+                self.rolling_duration = self.TIME_ROLLING  # Reset Timer Random Rolling Sound effect
+                self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # Reset Animation Duration
 
             # Change the animation speed to create the next dice image
             if not self.player.dice.number:

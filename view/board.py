@@ -30,8 +30,12 @@ class BoarGameView(pg.sprite.Sprite):
         self.player = player_board
         self.font = pg.font.Font(self.FONT_ROOT, 60)
         self.font_points = pg.font.Font(self.FONT_ROOT, 40)
+        # Action Font
         self.font_action_indicator = pg.font.Font(self.FONT_ROOT, 30)
         self.action_text = self.font_action_indicator.render('Press Space', False, 'Black')
+        # Player Name
+        self.font_name = pg.font.Font(self.FONT_ROOT, 45)
+        # Target Column to put the dice result
         self.target_column: int | None = None
 
         if self.color == 'Red':
@@ -268,6 +272,19 @@ class BoarGameView(pg.sprite.Sprite):
             for image, damage in zip(self.damages_img_lst, self.damages_rects_lst):
                 self.screen.blit(image, damage)
 
+    def show_player_name(self):
+
+        if self.color == 'Red':
+            name_text = self.font_name.render(f'{self.player.player.name}', False, 'Black')
+            name_rect = name_text.get_rect(center=(200, 120))
+            self.screen.blit(name_text, name_rect)
+
+        if self.color == 'Green':
+            name_text = self.font_name.render(f'{self.player.player.name}', False, 'Black')
+            name_rect = name_text.get_rect(center=(1000, 890))
+            self.screen.blit(name_text, name_rect)
+
+
     def show_turn_indicator(self):
         """Display if it is the player turn an arrow and a text to indicate the player turn."""
 
@@ -327,6 +344,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.show_grid_points(self.screen, self.grid_points)
         self.show_turn_indicator()
         self.show_slash()
+        self.show_player_name()
         # Slash events
         self.proces_removed_events()
         # Selection of dice position
