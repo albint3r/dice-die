@@ -26,7 +26,7 @@ class GameController:
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(self.screen_size)
         # Score Bar
-        self.score_bar = ScoreBarView(self.screen)  # Create Round corners
+        self.score_bar = ScoreBarView()  # Create Round corners
         self.score_bar_group = pg.sprite.GroupSingle(self.score_bar)
         self.score_bar.set_rounded()
         # Boards
@@ -87,7 +87,7 @@ class GameController:
 
             # Boards
             self.boars_group.draw(self.screen)
-            self.boars_group.update(self.screen,
+            self.boars_group.update(
                                     self.model.copy_fill_missing(self.model.p1.grid, reverse=True),
                                     self.model.copy_fill_missing(self.model.p2.grid, reverse=False),
                                     self.model.p1.points_board.points,

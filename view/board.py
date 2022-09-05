@@ -15,6 +15,9 @@ class BoarGameView(pg.sprite.Sprite):
     BROKEN1_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken1.png'
     BROKEN2_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken2.png'
     BROKEN3_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken3.png'
+    # Arrow
+    RED_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_arrow.png'
+    GREEN_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_arrow.png'
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
     FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
     BOARDS_SIZE = (600, 400)
@@ -22,11 +25,13 @@ class BoarGameView(pg.sprite.Sprite):
 
     def __init__(self, board_color: str, player_board):
         super().__init__()
-        self.screen_main = pg.display.get_surface()
+        self.screen = pg.display.get_surface()
         self.color = board_color
         self.player = player_board
         self.font = pg.font.Font(self.FONT_ROOT, 60)
         self.font_points = pg.font.Font(self.FONT_ROOT, 40)
+        self.font_action_indicator = pg.font.Font(self.FONT_ROOT, 30)
+        self.action_text = self.font_action_indicator.render('Press Space', False, 'Black')
         self.target_column: int | None = None
 
         if self.color == 'Red':
@@ -190,8 +195,10 @@ class BoarGameView(pg.sprite.Sprite):
                 self.add_broken()
             # Create Slash image
             slash_img = pg.transform.scale(pg.image.load(self.RED_SLASH_IMG).convert_alpha(), (500, 500))
-            slash_img_rect = slash_img.get_rect(center=self.coordinates_to_slash[0])
-            self.screen_main.blit(slash_img, slash_img_rect)
+            # Select the tuple and add 30px to x to center the slash with the number
+            coordinates = self.coordinates_to_slash[0]
+            slash_img_rect = slash_img.get_rect(center=(coordinates[0] + 35, coordinates[1]))
+            self.screen.blit(slash_img, slash_img_rect)
             # Set the time duration of the slash image
             self.cooldown_slash -= 1
             # If the time duration is 0 it will remove the coordinates of the slash target
@@ -259,7 +266,30 @@ class BoarGameView(pg.sprite.Sprite):
         """Display the damage image in front of the board player"""
         if self.damages_img_lst and self.damages_rects_lst:
             for image, damage in zip(self.damages_img_lst, self.damages_rects_lst):
-                self.screen_main.blit(image, damage)
+                self.screen.blit(image, damage)
+
+    def show_turn_indicator(self):
+        """Display if it is the player turn an arrow and a text to indicate the player turn."""
+
+        if self.player.dice.number:
+            self.action_text = self.font_action_indicator.render('Select Column', False, 'Black')
+        else:
+            self.action_text = self.font_action_indicator.render('Press Space', False, 'Black')
+
+        if self.color == 'Red' and self.player.is_turn:
+            text_rect = self.action_text.get_rect(center=(200, 400))
+            arrow_img = pg.transform.scale(pg.image.load(self.RED_ARROW_IMG_ROOT).convert_alpha(), (100, 70))
+            arrow_rect = arrow_img.get_rect(center=(200, 350))
+            self.screen.blit(self.action_text, text_rect)
+            self.screen.blit(arrow_img, arrow_rect)
+
+
+        if self.color == 'Green' and self.player.is_turn:
+            text_rect = self.action_text.get_rect(center=(1000, 605))
+            arrow_img = pg.transform.scale(pg.image.load(self.GREEN_ARROW_IMG_ROOT).convert_alpha(), (100, 70))
+            arrow_rect = arrow_img.get_rect(center=(1000, 650))
+            self.screen.blit(self.action_text, text_rect)
+            self.screen.blit(arrow_img, arrow_rect)
 
     def update_points(self):
         """Change players turn, update values and reset to avoid errors."""
@@ -284,17 +314,18 @@ class BoarGameView(pg.sprite.Sprite):
             # This make a call back to update the Turns in the game.
             func_update_total_score()
 
-    def update(self, screen, p1_grid_copy: dict, p2_grid_copy: dict, p1_grid_point: dict, p2_grid_point: dict,
+    def update(self, p1_grid_copy: dict, p2_grid_copy: dict, p1_grid_point: dict, p2_grid_point: dict,
                removed_dices_player: dict, opponent, func_update_total_score) -> None:
 
         self.assign_grid_to_board_color(p1_grid_copy, p2_grid_copy)
         self.assign_points_to_board_color(p1_grid_point, p2_grid_point)
         self.assign_removed_events(removed_dices_player)
         # Design
-        self.set_grid_rects(screen)
+        self.set_grid_rects(self.screen)
         self.show_damage()
-        self.show_grid_numbers(screen, self.grid_main)
-        self.show_grid_points(screen, self.grid_points)
+        self.show_grid_numbers(self.screen, self.grid_main)
+        self.show_grid_points(self.screen, self.grid_points)
+        self.show_turn_indicator()
         self.show_slash()
         # Slash events
         self.proces_removed_events()
