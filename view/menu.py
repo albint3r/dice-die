@@ -112,6 +112,9 @@ class ButtonView(pg.sprite.Sprite):
         self.font = pg.font.Font(self.FONT_ROOT, 50)
         self.text = self.font.render(text.title(), False, 'White')
         self.text_rect = self.text.get_rect(center=(x, y))
+        # Sound
+        self.sound = pg.mixer.Sound(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\piano_key.WAV')
+        self.is_sound = False
 
     def set_button_color(self):
         self.image = pg.transform.scale(pg.image.load(self.button_type[self.img_index]).convert_alpha(), self.SIZE)
@@ -119,10 +122,14 @@ class ButtonView(pg.sprite.Sprite):
     def show_text(self):
         self.screen.blit(self.text, self.text_rect)
 
-    def collision(self, game_state):
+    def press_button(self, game_state):
         mouse = pg.mouse.get_pressed()
 
         if self.rect.collidepoint(pg.mouse.get_pos()):  # This helps in the hover effect
+            if self.is_sound:
+                self.sound.play()
+                self.is_sound = False
+
             self.img_index = 0
             if mouse[0]:  # If right click do any of the actions below
                 match self.btn_name:
@@ -136,9 +143,11 @@ class ButtonView(pg.sprite.Sprite):
 
         else:
             self.img_index = 1
+            self.sound.stop()
+            self.is_sound = True
 
     def update(self, game_state):
-        self.collision(game_state)
+        self.press_button(game_state)
         self.show_text()
         self.set_button_color()
 

@@ -168,6 +168,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.validate_and_show_grid_numbers(screen, col_coordinates_list, grid)
 
     def get_grid_coordinates(self) -> tuple:
+        """Return list of tuples with the coordinates of the numbers location of each board."""
         return self.col1_coor, self.col2_coor, self.col3_coor
 
     def show_grid_points(self, screen, grid_point: dict):
@@ -199,9 +200,9 @@ class BoarGameView(pg.sprite.Sprite):
                 self.add_broken()
             # Create Slash image
             slash_img = pg.transform.scale(pg.image.load(self.RED_SLASH_IMG).convert_alpha(), (500, 500))
-            # Select the tuple and add 30px to x to center the slash with the number
+            # Select the tuple and add 38px to x and 10px to Y to center the slash with the number
             coordinates = self.coordinates_to_slash[0]
-            slash_img_rect = slash_img.get_rect(center=(coordinates[0] + 35, coordinates[1]))
+            slash_img_rect = slash_img.get_rect(center=(coordinates[0] + 38, coordinates[1] + 10))
             self.screen.blit(slash_img, slash_img_rect)
             # Set the time duration of the slash image
             self.cooldown_slash -= 1
@@ -224,6 +225,7 @@ class BoarGameView(pg.sprite.Sprite):
                     screen.blit(text, text_rect)
 
     def set_target_column(self):  # TODO MOVE TO CONTROLS, I DONT KNOW HOW BUT THIS MUST BE IN OTHER CLASS
+        """Control the Mouse Click when the player select the target column to put the dice result."""
         right_click = pg.mouse.get_pressed()[0]  # index 0 is the right mouse button
         mouse_pos = pg.mouse.get_pos()
         for i, rect in enumerate(self.grid_rects.values(), start=1):
@@ -273,7 +275,7 @@ class BoarGameView(pg.sprite.Sprite):
                 self.screen.blit(image, damage)
 
     def show_player_name(self):
-
+        """Display the name of the player 1 and 2 in the corners of top and bottom of the screen."""
         if self.color == 'Red':
             name_text = self.font_name.render(f'{self.player.player.name}', False, 'Black')
             name_rect = name_text.get_rect(center=(200, 120))
@@ -321,6 +323,7 @@ class BoarGameView(pg.sprite.Sprite):
             GameModel.remove_and_update_opponent_board(opponent, self.target_column, self.player.dice.number)
 
     def update_turn(self, func_update_total_score, opponent):
+        """Add one to the turn count using a callback from the function update total score"""
         if self.player.is_turn and self.target_column:
             self.player.dice.number = None
             self.target_column = None

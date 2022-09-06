@@ -68,11 +68,12 @@ class GameController:
             self.screen.fill('Black')  # To refresh the black screen
             self.screen.blit(self.background_img, self.background_rect)
             for event in pg.event.get():
-                self.menu.create_new_dice(event)
                 # If player click cross exit game
                 if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
+                if self.game_state['menu']:
+                    self.menu.create_new_dice(event)
 
             if self.game_state['menu']:
                 self.menu.run(self.game_state)
