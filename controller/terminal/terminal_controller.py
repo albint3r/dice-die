@@ -8,8 +8,6 @@ from view.terminal.terminal_view import TerminalView
 
 class TerminalController(AbstractController):
 
-
-
     def __init__(self):
         self.view = TerminalView()
         super().__init__()
@@ -86,8 +84,3 @@ class TerminalController(AbstractController):
 
         self.model.save_game_result()
         self.model.save_game_grid()
-
-
-
-
-

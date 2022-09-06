@@ -222,6 +222,7 @@ class GameModel:
         )
 
         self.score_match.grid_tb.save()
+        print('Save Result successful')
 
     def create_last_turn_grids(self) -> list:
         """Create a players grid Copy filling the missing values.

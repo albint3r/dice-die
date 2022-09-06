@@ -107,7 +107,19 @@ class GameController:
                 if not current_player.is_turn:
                     self.turn = self.model.change_player_turn(self.turn)
 
+                game_over = self.model.is_game_over(current_player)  # TODO CHECK WHY THIS IS TRUE, THIS MUST BE FALSE IN THE TERMINAL VERSION IS THAT WAY.
+                print(game_over)
+
             # Update All Game
             pg.display.update()
-
+            # Is Game Over or next player?
             self.clock.tick(self.FPS)
+
+        # Save Game Match
+        self.model.select_winner()
+        self.model.fill_missing_dice_results(self.model.p1)
+        self.model.fill_missing_dice_results(self.model.p2)
+        self.model.save_game_result()
+        self.model.save_game_grid()
+
+
