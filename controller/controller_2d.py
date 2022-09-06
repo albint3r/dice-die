@@ -4,6 +4,8 @@ import sys
 # Views
 from view.score_bar import ScoreBarView
 from view.board import BoarGameView
+# Model
+from model.game_engine import GameModel
 
 # General Set Up
 pg.init()

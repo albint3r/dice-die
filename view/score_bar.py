@@ -10,19 +10,31 @@ class ScoreBarView(pg.sprite.Sprite):
     COLOR_GREEN = '#78BD91'
     COLOR_RED_SHADOW = '#BB314F'
     COLOR_GREEN_SHADOW = '#4D8F81'
-    BAR_SPEED = 1
+    BAR_SPEED = 5
     BORDER_RADIUS = 5
-    FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
+    # FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
+    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\BebasNeue-Regular.ttf'
+    POINTS_FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
+    RED_HALO_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_halo.png'
+    GREEN_HALO_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_halo.png'
 
-    def __init__(self, screen):
+    def __init__(self):
         super().__init__()
-        self.screen = screen
+        self.screen = pg.display.get_surface()
         self.original_image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.original_image.fill(self.COLOR_GREEN)
         self.image = self.original_image
         self.rect = self.image.get_rect(center=(self.X_POS, self.Y_POS))
         self.red_bar_size = 200
         self.font = pg.font.Font(self.FONT_ROOT, 22)  # Todo ADD FONT TEXT
+        # Halo
+        self.points_font = pg.font.Font(self.POINTS_FONT_ROOT, 100)
+        # Red
+        self.red_halo_img = pg.transform.scale(pg.image.load(self.RED_HALO_ROOT).convert_alpha(), (200, 200))
+        self.red_halo_rect = self.red_halo_img.get_rect(center=(200, 500))
+        # Green
+        self.green_halo_img = pg.transform.scale(pg.image.load(self.GREEN_HALO_ROOT).convert_alpha(), (200, 200))
+        self.green_halo_rect = self.green_halo_img.get_rect(center=(1000, 500))
 
     def set_rounded(self):
         """Make round corners in the score bar"""
@@ -40,7 +52,7 @@ class ScoreBarView(pg.sprite.Sprite):
         shadow_rect = shadow_image.get_rect(center=(self.X_POS - x_less, self.Y_POS + y_less))
         pg.draw.rect(self.screen, self.COLOR_GREEN_SHADOW, shadow_rect, border_radius=self.BORDER_RADIUS)
 
-    def set_red_bar(self):
+    def show_red_bar(self):
         """Create the Red Bar Score"""
         # This is a threshold to display the red bar ok.
         # Below this value it would create a rectangle square in the left
@@ -61,22 +73,41 @@ class ScoreBarView(pg.sprite.Sprite):
     def update_bar_size(self, p1_score: int, p2_score: int):
         """Update the size frame by frame of the Red Bar Size"""
         new_red_bar_size = self.calculate_bar_per(p1_score, p2_score)
-        if new_red_bar_size > self.red_bar_size:
-            self.red_bar_size += self.BAR_SPEED
-        elif new_red_bar_size < self.red_bar_size:
+
+        if self.red_bar_size > new_red_bar_size and self.red_bar_size > new_red_bar_size + self.BAR_SPEED:
             self.red_bar_size -= self.BAR_SPEED
+        elif self.red_bar_size < new_red_bar_size and self.red_bar_size < new_red_bar_size - self.BAR_SPEED:
+            self.red_bar_size += self.BAR_SPEED
         else:
             self.red_bar_size = new_red_bar_size
 
-    def set_turns_text(self, turn):
-        text = self.font.render(f'Turn: {turn}', False, 'White')
+    def show_turns_text(self, turn):
+        text = self.font.render(f'Turn: {turn}', False, 'Black')
         text_rect = text.get_rect(center=(self.X_POS, self.Y_POS - 30))
         self.screen.blit(text, text_rect)
+
+    def show_red_total_points(self, p1_total_point):
+        """Display the total red points"""
+        # Points
+        font_img = self.points_font.render(f"{p1_total_point}", False, 'Black')
+        font_rect = font_img.get_rect(center=(200, 510))
+        # Show
+        self.screen.blit(font_img, font_rect)
+        self.screen.blit(self.red_halo_img, self.red_halo_rect)
+
+    def show_green_total_points(self, p2_total_point):
+        """Display the total green points"""
+        # Points
+        font_img = self.points_font.render(f"{p2_total_point}", False, 'Black')
+        font_rect = font_img.get_rect(center=(1000, 510))
+        # Show
+        self.screen.blit(font_img, font_rect)
+        self.screen.blit(self.green_halo_img, self.green_halo_rect)
 
     def set_timer_text(self):
         timer = pg.time.get_ticks() / 1000
         timer = dt.datetime.fromtimestamp(timer)
-        text = self.font.render(f'Time   {timer.minute} : {timer.second}', False, 'White')
+        text = self.font.render(f'Time   {timer.minute} : {timer.second}', False, 'Black')
         text_rect = text.get_rect(center=(self.X_POS, self.Y_POS + 35))
         self.screen.blit(text, text_rect)
 
@@ -84,11 +115,18 @@ class ScoreBarView(pg.sprite.Sprite):
         """"""
         total_points = p1_score + p2_score
         # Red Bar Player
-        p1_points_per = p1_score / total_points
-        p2_points_per = p2_score / total_points
+        try:
+            p1_points_per = p1_score / total_points
+        except ZeroDivisionError:
+            p1_points_per = 0
+        try:
+            p2_points_per = p2_score / total_points
+        except ZeroDivisionError:
+            p2_points_per = 0
+
         return p1_points_per, p2_points_per
 
-    def set_players_score_per(self, p1_score: int, p2_score: int):
+    def show_players_score_per(self, p1_score: int, p2_score: int):
         # Get Scores percentage
         p1_score_per, p2_score_per = self.get_players_score_per(p1_score, p2_score)
         # Setup Player1
@@ -125,7 +163,9 @@ class ScoreBarView(pg.sprite.Sprite):
 
     def update(self, p1_score: int, p2_score: int, turns: int):
         self.update_bar_size(p1_score, p2_score)
-        self.set_red_bar()
-        self.set_turns_text(turns)
-        self.set_players_score_per(p1_score, p2_score)
+        self.show_red_bar()
+        self.show_turns_text(turns)
+        self.show_players_score_per(p1_score, p2_score)
+        self.show_red_total_points(p1_score)
+        self.show_green_total_points(p2_score)
         self.set_timer_text()

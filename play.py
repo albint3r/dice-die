@@ -1,6 +1,9 @@
 from controller.terminal.terminal_controller import TerminalController
-
-ctrl = TerminalController()
+from controller.game_controller import GameController
+game_control = GameController()
 
 if __name__ == '__main__':
-    ctrl.start_new_game()
+    game_control.model.p1.player.name = 'Tobe'
+    game_control.model.p2.player.name = 'Susy'
+
+    game_control.play()

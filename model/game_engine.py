@@ -17,7 +17,7 @@ class GameModel:
     p2: Board = field(default_factory=Board)
     score_match: ScoreMatch = field(default_factory=ScoreMatch, repr=False)
     winner_status: int | None = None
-    last_turn_grids: list | None = None
+    last_turn_grids: list | None = None  # Is the last turn board grid result of both players.
     changes_state: dict | None = None
 
     def __post_init__(self):
@@ -45,7 +45,7 @@ class GameModel:
                 GameModel.fill_missing_dice_results(player)
 
     @staticmethod
-    def copy_fill_missing(grid: dict, fill_value: int = 0) -> dict:
+    def copy_fill_missing(grid: dict, reverse=False, fill_value: int = 0) -> dict:
         """Create a Copy of the Player Grid and fill all the missing values.
         This helps to display the grid result in the 2D version.
         """
@@ -62,6 +62,11 @@ class GameModel:
             if total_missing_vals:
                 for ii in range(total_missing_vals):
                     col.append(fill_value)
+
+        if reverse:
+            copy[1] = copy[1][::-1]
+            copy[2] = copy[2][::-1]
+            copy[3] = copy[3][::-1]
 
         return copy
 
@@ -149,9 +154,13 @@ class GameModel:
             opponent.points_board.update_total_score()
 
     def select_player_start(self) -> tuple[Board, Board]:
-        """Simulate a coin toss to select which player starts"""
+        """Simulate a coin toss to select which player starts
+        This change the is_turn attribute to True if the player start, but this only works in the 2D version.
+        """
         coin_toss = random.randint(0, 1)
-        return (self.p1, self.p2) if coin_toss else (self.p2, self.p1)
+        players_order = (self.p1, self.p2) if coin_toss else (self.p2, self.p1)
+        players_order[0].is_turn = True
+        return players_order
 
     @staticmethod
     def select_opponent(players: tuple, turn: int) -> Board:
@@ -213,9 +222,16 @@ class GameModel:
         )
 
         self.score_match.grid_tb.save()
+        print('Save Result successful')
 
     def create_last_turn_grids(self) -> list:
-        return [self.copy_fill_missing(grid) for grid in (self.p1.grid, self.p2.grid)]
+        """Create a players grid Copy filling the missing values.
+        This helps to identify changes in the game to display the X mark in the 2D game.
+        Also, is important tha the firs player have a reverse grid, because the game
+        display a mirror view to play
+        """
+        return [self.copy_fill_missing(grid, reverse) for reverse, grid in
+                zip((True, False), (self.p1.grid, self.p2.grid))]
 
     def get_removed_dices_player(self, echo: bool = False) -> dict:
         # Validate if exist the last turn grid
@@ -229,7 +245,7 @@ class GameModel:
                 for i in range(1, 4):
                     # Check Tru if note changes between the new and the old copy.
                     if not old_copy[i] == new_copy[i]:
-                        # Leave this prints to watch all the proces
+                        # Leave this prints to watch all the process
                         if echo:
                             print(f'\n**** Player {player_counter} ********')
                             print('old', old_copy[i])
@@ -258,5 +274,5 @@ class GameModel:
         num_missing = list(num_missing)[0] if num_missing else 0
         # Find index of the missing values if there are not 0
         if num_missing:
-            indexes_missing_num = [True if num == num_missing else False for i, num in enumerate(col_old_copy) ]
+            indexes_missing_num = [True if num == num_missing else False for i, num in enumerate(col_old_copy)]
             return indexes_missing_num
