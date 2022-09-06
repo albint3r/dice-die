@@ -16,7 +16,7 @@ class DiceView(pg.sprite.Sprite):
     DICE_ROLL_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\dice_roll.mp3'
     DICE_SIZE = (150, 150)
     TIME_SOUND_DELAY = 1500  # 0.5 seconds
-    TIME_ROLLING = 580
+    TIME_ROLLING = 560
     TIME_FLIP_DICE = 10
 
     def __init__(self, color: str, player_board):
@@ -75,8 +75,8 @@ class DiceView(pg.sprite.Sprite):
             self.roll_sound.play()
             print(self.player.dice.number, self.player.player.name)
             self.random_rolling_sound_flag = True  # Turn on this flag for the next turn apply the effect
-            self.rolling_duration = 900  # Reset Timer Random Rolling Sound effect
-            self.animation_random_rolling_duration = 60  # Reset Animation Duration
+            self.rolling_duration = self.TIME_ROLLING  # Reset Timer Random Rolling Sound effect
+            self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # Reset Animation Duration
 
     def show_dice_result(self):
         """Show the real dice throw of the player in the boardgame"""
