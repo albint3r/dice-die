@@ -80,7 +80,8 @@ class Board:
     def is_grid_full(self) -> bool:
         """Return True if the Player Grid is Full. Is full if it reaches the multiplication of the max_colum_size"""
         # Because is an Even Matrix it multiplies the max columns number by itself.
-        return sum([len(col) for col in self.grid.values()]) == self.max_column_size * self.max_column_size
+        # The max expected is 9
+        return sum([len(col) for col in self.grid.values()]) == (self.max_column_size * self.max_column_size)
 
     @property
     def max_column_size(self) -> int:
