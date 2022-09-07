@@ -1,11 +1,11 @@
 # Import
 import pygame as pg
 import random
+from config import config
 
 
 class MenuView:
-    TIMER_DELAY = 500  # 0.5 seconds
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\BebasNeue-Regular.ttf'
+    TIMER_DELAY = 300  # 0.3 seconds
 
     def __init__(self):
         self.screen = pg.display.get_surface()
@@ -23,7 +23,7 @@ class MenuView:
         # Add button to group
         self.set_buttons_to_group()
         # Add Text
-        self.font_brand = pg.font.Font(self.FONT_ROOT, 20)
+        self.font_brand = pg.font.Font(config.get('FONT').get('BEBAS'), 20)
         self.albinter_text = self.font_brand.render('Albinter Inc', False, 'Black')
         self.version_text = self.font_brand.render('Version 1.0.0', False, 'Black')
 
@@ -34,7 +34,7 @@ class MenuView:
     def create_new_dice(self, event):
         """Create dices that are falling"""
         if event.type == self.timer_event:
-            self.dices_group.add(FallingDicesView())
+            self.dices_group.add(FallingObjectsView())
 
     def set_buttons_to_group(self):
         self.buttons_group.add(self.start_btn)
@@ -54,15 +54,15 @@ class MenuView:
         self.buttons_group.update(game_state)
 
 
-class FallingDicesView(pg.sprite.Sprite):
-    RAND_INT = [(50, 50), (50, 50), (50, 50), (150, 150), (200, 200)]
-    DICE_IMG = {1: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\1.png',
-                2: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\2.png',
-                3: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\3.png',
-                4: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\4.png',
-                5: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\5.png',
-                6: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\6.png',
-                7: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\bitcoin.png'}
+class FallingObjectsView(pg.sprite.Sprite):
+    RAND_INT = [(50, 50), (50, 50), (50, 50), (100, 100), (100, 100), (150, 150), (200, 200)]
+    DICE_IMG = {1: config.get('IMG').get('DICE1'),
+                2: config.get('IMG').get('DICE2'),
+                3: config.get('IMG').get('DICE3'),
+                4: config.get('IMG').get('DICE4'),
+                5: config.get('IMG').get('DICE5'),
+                6: config.get('IMG').get('DICE6'),
+                7: config.get('IMG').get('BITCOIN')}
 
     def __init__(self):
         super().__init__()
@@ -96,12 +96,11 @@ class FallingDicesView(pg.sprite.Sprite):
 
 class ButtonView(pg.sprite.Sprite):
     SIZE = (400, 200)
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
 
     def __init__(self, x: float, y: float, text: str):
         super().__init__()
-        self.button_type = (r'C:\Users\albin\PycharmProjects\dice_&_die\statics\gree_button.png',
-                            r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_button.png')
+        self.button_type = (config.get('IMG').get('GREEN_BTN'),
+                            config.get('IMG').get('RED_BTN'))
 
         self.screen = pg.display.get_surface()
         self.img_index = 1
@@ -109,11 +108,11 @@ class ButtonView(pg.sprite.Sprite):
         self.image = pg.transform.scale(pg.image.load(self.button_type[self.img_index]).convert_alpha(), self.SIZE)
         self.rect = self.image.get_rect(center=(x, y))
         # Font text
-        self.font = pg.font.Font(self.FONT_ROOT, 50)
+        self.font = pg.font.Font(config.get('FONT').get('MAGIC'), 50)
         self.text = self.font.render(text.title(), False, 'White')
         self.text_rect = self.text.get_rect(center=(x, y))
         # Sound
-        self.sound = pg.mixer.Sound(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\piano_key.WAV')
+        self.sound = pg.mixer.Sound(config.get('SOUND').get('PIANO_BTN'))
         self.is_sound = False
         self.is_click = False
 
@@ -174,9 +173,8 @@ class ButtonView(pg.sprite.Sprite):
 
 class LogoGame(pg.sprite.Sprite):
     SIZE = (600, 600)
-    IMG_ROOT = r"C:\Users\albin\PycharmProjects\dice_&_die\statics\logo.png"
 
     def __init__(self, x, y):
         super().__init__()
-        self.image = pg.transform.scale(pg.image.load(self.IMG_ROOT).convert_alpha(), self.SIZE)
+        self.image = pg.transform.scale(pg.image.load(config.get('IMG').get('LOGO')).convert_alpha(), self.SIZE)
         self.rect = self.image.get_rect(center=(x, y))

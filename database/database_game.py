@@ -6,12 +6,13 @@ import sqlalchemy  # Used to the hint types of the attributes
 # DataBase
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from config import config
 
 
 @dataclass
 class DataBaseGame:
 
-    ROOT_DB: str = r'sqlite:///C:\Users\albin\PycharmProjects\dice_&_die\database\game.db'
+    ROOT_DB: str = f'sqlite:///{config.get("DB").get("DATABASE")}'
 
     engine: sqlalchemy.engine.base.Engine = None
     base: sqlalchemy.orm.decl_api.DeclarativeMeta = field(default_factory=declarative_base)

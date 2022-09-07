@@ -114,35 +114,4 @@ class GridsResult(db.base):
 if __name__ == '__main__':
     # Create quick the database
     db.base.metadata.create_all(db.engine)
-    x = db.session.query(GameResult).all()
-    y = db.session.query(GridsResult).all()
-    match = db.session.query(GameResult).get(1)
 
-    for row in y:
-        print(row.id)
-        print(row.date)
-        print(row.p1_row0_col1)
-        print(row.p1_row1_col1)
-        print(row.p1_row2_col1)
-
-        print(row.p1_row0_col2)
-        print(row.p1_row1_col2)
-        print(row.p1_row2_col2)
-
-        print(row.p1_row0_col3)
-        print(row.p1_row1_col3)
-        print(row.p1_row2_col3)
-        print('*************')
-        print(row.p2_row0_col1)
-        print(row.p2_row1_col1)
-        print(row.p2_row2_col1)
-
-        print(row.p2_row0_col2)
-        print(row.p2_row1_col2)
-        print(row.p2_row2_col2)
-
-        print(row.p2_row0_col3)
-        print(row.p2_row1_col3)
-        print(row.p2_row2_col3)
-        print('*************')
-        print(row.match_id)

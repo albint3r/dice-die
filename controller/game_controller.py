@@ -23,9 +23,10 @@ class GameController:
         self.screen_size: tuple[int, int] = (1200, 1000)
         self.FPS: int = 60
         self.active_game: bool = True
-        self.game_state: dict = dict(menu=False, how_to_play=False,
-                                     leader_board=True, match=False,
+        self.game_state: dict = dict(menu=True, how_to_play=False,
+                                     leader_board=False, match=False,
                                      winner=False, retry=False)
+        self.is_save: bool = True
 
         # Pygame
         pg.init()
@@ -74,6 +75,7 @@ class GameController:
         self.model = GameModel()
         self.model.p1.player.name = p1_name
         self.model.p2.player.name = p2_name
+        self.is_save = True
         self.select_game_state('match')
         self.create_new_game()
 
@@ -106,9 +108,7 @@ class GameController:
             current_player = players[self.turn]
             opponent = self.model.select_opponent(players, self.turn)
 
-            # print(current_player.grid)
             # Roll the dice
-
             self.screen.fill('Black')  # To refresh the black screen
             self.screen.blit(self.background_img, self.background_rect)
             for event in pg.event.get():
@@ -123,7 +123,7 @@ class GameController:
                 self.menu.run(self.game_state)
 
             if self.game_state['leader_board']:
-                self.leader_board.run()
+                self.leader_board.run(self.game_state)
 
             # If true Match in display
             if self.game_state['match']:
@@ -158,9 +158,15 @@ class GameController:
             if self.game_state['winner']:
                 self.model.select_winner()
                 self.winner_podium.run(self.game_state, self.model.winner_status)
+                if self.is_save:
+                    # Save Game Match
+                    self.model.fill_missing_dice_results(self.model.p1)
+                    self.model.fill_missing_dice_results(self.model.p2)
+                    self.model.save_game_result()
+                    self.model.save_game_grid()
+                    self.is_save = False  # Only this will be re activated if the player retry the game
 
             if self.game_state['retry']:
-                print('que ondaaa!')
                 self.retry_game()
                 players = self.model.select_player_start()
 
@@ -168,9 +174,3 @@ class GameController:
             pg.display.update()
             # Is Game Over or next player?
             self.clock.tick(self.FPS)
-
-        # Save Game Match
-        self.model.fill_missing_dice_results(self.model.p1)
-        self.model.fill_missing_dice_results(self.model.p2)
-        self.model.save_game_result()
-        self.model.save_game_grid()

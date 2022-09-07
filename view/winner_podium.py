@@ -2,10 +2,10 @@
 import pygame as pg
 # Project Modules
 from view.menu import ButtonView
+from config import config
 
 
 class WinnerPodiumView:
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
 
     def __init__(self, model):
         self.screen = pg.display.get_surface()
@@ -17,7 +17,7 @@ class WinnerPodiumView:
         self.is_tie = False
         # Trophy
         self.trophy = pg.sprite.GroupSingle(Trophy(600, 200))
-        self.font = pg.font.Font(self.FONT_ROOT, 80)
+        self.font = pg.font.Font(config.get("FONT").get('MAGIC'), 80)
         # Buttons
         self.menu = pg.sprite.Group()
         self.menu.add(ButtonView(400, 910, 'retry'))
@@ -66,7 +66,7 @@ class WinnerPodiumView:
 
     def show_player_winner_name_in_trophy(self):
         # Winner
-        font = pg.font.Font(self.FONT_ROOT, 25)
+        font = pg.font.Font(config.get("FONT").get('MAGIC'), 25)
         if not self.is_tie:
             winner_name = font.render(f'{self.winner.player.name}', False, 'Black')
         else:
@@ -75,7 +75,7 @@ class WinnerPodiumView:
         # Show
         self.screen.blit(winner_name, winner_name_rect)
 
-    def run(self, game_state,  winner_status):
+    def run(self, game_state, winner_status):
         """Run all the methods and functions of all the objects"""
 
         self.trophy.draw(self.screen)
@@ -90,13 +90,13 @@ class WinnerPodiumView:
 
 
 class Trophy(pg.sprite.Sprite):
-    IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\trophy.png'
+
     SIZE = (300, 400)
 
     def __init__(self, x_pos, y_pos):
         super(Trophy, self).__init__()
         self.screen = pg.display.get_surface()
-        self.image = pg.transform.scale(pg.image.load(self.IMG_ROOT).convert_alpha(), self.SIZE)
+        self.image = pg.transform.scale(pg.image.load(config.get('IMG').get('TROPHY')).convert_alpha(), self.SIZE)
         self.rect = self.image.get_rect(center=(x_pos, y_pos))
         self.x = x_pos
         self.y = y_pos

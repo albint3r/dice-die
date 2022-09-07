@@ -1,5 +1,8 @@
 # Imports
 import pygame as pg
+# Modules Projects
+from view.menu import ButtonView
+from config import config
 
 
 class LeaderBoardView:
@@ -7,26 +10,29 @@ class LeaderBoardView:
     def __init__(self, score_match):
         self.screen = pg.display.get_surface()
         self.board_table = pg.sprite.GroupSingle(LeaderBoardTable(score_match))
-        self.menu = None
+        self.menu = pg.sprite.Group()
+        self.menu.add(ButtonView(600, 920, 'Back to menu'))
 
-    def run(self):
+    def run(self, game_state):
+        # Menu
+        self.menu.draw(self.screen)
+        self.menu.update(game_state)
+        # Board
         self.board_table.draw(self.screen)
         self.board_table.update()
 
 
 class LeaderBoardTable(pg.sprite.Sprite):
-    IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\leader_board.png'
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
     SIZE = (1000, 800)
 
     def __init__(self, score_match):
         super(LeaderBoardTable, self).__init__()
         self.screen = pg.display.get_surface()
-        self.image = pg.transform.scale(pg.image.load(self.IMG_ROOT).convert_alpha(), self.SIZE)
+        self.image = pg.transform.scale(pg.image.load(config.get('IMG').get('LEADER_BOARD')).convert_alpha(), self.SIZE)
         self.rect = self.image.get_rect(center=(600, 500))
         # Fonts
-        self.font_title = pg.font.Font(self.FONT_ROOT, 100)
-        self.font_board = pg.font.Font(self.FONT_ROOT, 40)
+        self.font_title = pg.font.Font(config.get('FONT').get('MAGIC'), 100)
+        self.font_board = pg.font.Font(config.get('FONT').get('MAGIC'), 40)
         # SQL Table
         self.score_match = score_match
 
@@ -58,6 +64,19 @@ class LeaderBoardTable(pg.sprite.Sprite):
             # This adds space between the names
             y_pos = y_pos + height_spaces_players
 
+    def show_table_labels(self):
+        """Display the name of the top players"""
+
+        labels = ('Name', 'Total Wins', 'Avg. Turn to win')
+        x_pos = (300, 600, 900)
+
+        for x, label in zip(x_pos, labels):
+            # label
+            label = self.font_board.render(label, False, 'White')
+            label_rect = label.get_rect(center=(x, 250))
+            self.screen.blit(label, label_rect)
+
     def update(self):
+        self.show_table_labels()
         self.show_top_player_stats()
         self.show_title_top_10()

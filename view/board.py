@@ -3,23 +3,25 @@ import pygame as pg
 import random
 # Model
 from model.game_engine import GameModel
+# Config
+from config import config
 
 
 class BoarGameView(pg.sprite.Sprite):
-    RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
-    GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
-    RED_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
-    BLUE_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash2.png'
-    SLASH_SOUND = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\slash1_sound.mp3'
+    RED_BOARD_IMG_ROOT = config.get('IMG').get('RED_BOARD')
+    GREEN_BOARD_IMG_ROOT = config.get('IMG').get('GREEN_BOARD')
+    RED_SLASH_IMG = config.get('IMG').get('RED_SLASH')
+    BLUE_SLASH_IMG = config.get('IMG').get('BLUE_SLASH')
+    SLASH_SOUND = config.get('SOUND').get('SLASH')
     # Damage
-    BROKEN1_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken1.png'
-    BROKEN2_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken2.png'
-    BROKEN3_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken3.png'
+    BROKEN1_IMG = config.get('IMG').get('BROKEN1')
+    BROKEN2_IMG = config.get('IMG').get('BROKEN2')
+    BROKEN3_IMG = config.get('IMG').get('BROKEN3')
     # Arrow
-    RED_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_arrow.png'
-    GREEN_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_arrow.png'
+    RED_ARROW_IMG_ROOT = config.get('IMG').get('RED_ARROW')
+    GREEN_ARROW_IMG_ROOT = config.get('IMG').get('GREEN_ARROW')
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
+    FONT_ROOT = config.get('FONT').get('MAGIC')
     BOARDS_SIZE = (600, 400)
     COL_SIZE = (163, 247)
 
