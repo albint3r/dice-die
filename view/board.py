@@ -3,23 +3,25 @@ import pygame as pg
 import random
 # Model
 from model.game_engine import GameModel
+# Config
+from config import config
 
 
 class BoarGameView(pg.sprite.Sprite):
-    RED_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_board.png'
-    GREEN_BOARD_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_board.png'
-    RED_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash1.png'
-    BLUE_SLASH_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\slash2.png'
-    SLASH_SOUND = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\slash1_sound.mp3'
+    RED_BOARD_IMG_ROOT = config.get('IMG').get('RED_BOARD')
+    GREEN_BOARD_IMG_ROOT = config.get('IMG').get('GREEN_BOARD')
+    RED_SLASH_IMG = config.get('IMG').get('RED_SLASH')
+    BLUE_SLASH_IMG = config.get('IMG').get('BLUE_SLASH')
+    SLASH_SOUND = config.get('SOUND').get('SLASH')
     # Damage
-    BROKEN1_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken1.png'
-    BROKEN2_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken2.png'
-    BROKEN3_IMG = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\broken3.png'
+    BROKEN1_IMG = config.get('IMG').get('BROKEN1')
+    BROKEN2_IMG = config.get('IMG').get('BROKEN2')
+    BROKEN3_IMG = config.get('IMG').get('BROKEN3')
     # Arrow
-    RED_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_arrow.png'
-    GREEN_ARROW_IMG_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_arrow.png'
+    RED_ARROW_IMG_ROOT = config.get('IMG').get('RED_ARROW')
+    GREEN_ARROW_IMG_ROOT = config.get('IMG').get('GREEN_ARROW')
     # FONT_ROOT = r'../statics/font/Magical Story.ttf'
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
+    FONT_ROOT = config.get('FONT').get('MAGIC')
     BOARDS_SIZE = (600, 400)
     COL_SIZE = (163, 247)
 
@@ -228,19 +230,39 @@ class BoarGameView(pg.sprite.Sprite):
         """Control the Mouse Click when the player select the target column to put the dice result."""
         right_click = pg.mouse.get_pressed()[0]  # index 0 is the right mouse button
         mouse_pos = pg.mouse.get_pos()
+        temp_target_column = None
         for i, rect in enumerate(self.grid_rects.values(), start=1):
             if rect.collidepoint(mouse_pos) and right_click and self.player.dice.number and not self.target_column:
                 # Select the dice position column
                 match i:
                     case 1:
-                        self.target_column = 1
-                        print(f'The dice position {self.target_column}', self.player.player.name)
+                        temp_target_column = 1
                     case 2:
-                        self.target_column = 2
-                        print(f'The dice position {self.target_column}', self.player.player.name)
+                        temp_target_column = 2
                     case 3:
-                        self.target_column = 3
-                        print(f'The dice position {self.target_column}', self.player.player.name)
+                        temp_target_column = 3
+            # It the selected column is not full it would be added to the target column attribute
+            if temp_target_column and not self.player.is_column_full(temp_target_column):
+                self.target_column = temp_target_column
+
+    def set_target_column_key_board(self):
+        """Set the target value with the keyboard"""
+        keys = pg.key.get_pressed()
+        temp_target_column = None
+
+        if self.player.is_turn and self.player.dice.number and not self.target_column:
+
+            if keys[pg.K_1]:
+                temp_target_column = 1
+
+            elif keys[pg.K_2]:
+                temp_target_column = 2
+
+            elif keys[pg.K_3]:
+                temp_target_column = 3
+        # It the selected column is not full it would be added to the target column attribute
+        if temp_target_column and not self.player.is_column_full(temp_target_column):
+            self.target_column = temp_target_column
 
     def add_to_column(self):
         """Add the dice to the selected column"""
@@ -286,7 +308,6 @@ class BoarGameView(pg.sprite.Sprite):
             name_rect = name_text.get_rect(center=(1000, 890))
             self.screen.blit(name_text, name_rect)
 
-
     def show_turn_indicator(self):
         """Display if it is the player turn an arrow and a text to indicate the player turn."""
 
@@ -301,7 +322,6 @@ class BoarGameView(pg.sprite.Sprite):
             arrow_rect = arrow_img.get_rect(center=(200, 350))
             self.screen.blit(self.action_text, text_rect)
             self.screen.blit(arrow_img, arrow_rect)
-
 
         if self.color == 'Green' and self.player.is_turn:
             text_rect = self.action_text.get_rect(center=(1000, 605))
@@ -352,6 +372,7 @@ class BoarGameView(pg.sprite.Sprite):
         self.proces_removed_events()
         # Selection of dice position
         self.set_target_column()
+        self.set_target_column_key_board()
         self.add_to_column()
         self.update_points()
         self.update_opponent_game(opponent)

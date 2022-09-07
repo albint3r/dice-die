@@ -10,6 +10,8 @@ from view.board import BoarGameView
 from view.dice import DiceView
 from view.menu import MenuView
 from view.winner_podium import WinnerPodiumView
+from view.leader_board import LeaderBoardView
+from view.how_to_play import HowToPlayView
 
 
 class GameController:
@@ -25,13 +27,30 @@ class GameController:
         self.game_state: dict = dict(menu=True, how_to_play=False,
                                      leader_board=False, match=False,
                                      winner=False, retry=False)
+        self.is_save: bool = True
 
         # Pygame
         pg.init()
+        self.leader_board = None
+        self.clock = None
+        self.screen = None
+        self.menu = None
+        self.score_bar = None
+        self.score_bar_group = None
+        self.boars_group = None
+        self.dice = None
+        self.background_img = None
+        self.background_rect = None
+        self.winner_podium = None
+        self.how_to_play = None
+
+    def create_new_game(self):
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(self.screen_size)
         # Menu
         self.menu = MenuView()
+        # Leader board
+        self.leader_board = LeaderBoardView(self.model.score_match)
         # Score Bar
         self.score_bar = ScoreBarView()  # Create Round corners
         self.score_bar_group = pg.sprite.GroupSingle(self.score_bar)
@@ -49,6 +68,26 @@ class GameController:
         self.background_rect = self.background_img.get_rect(center=(600, 500))
         # Winner Podium
         self.winner_podium = WinnerPodiumView(self.model)
+        # How to play
+        self.how_to_play = HowToPlayView()
+
+    def retry_game(self):
+        p1_name = self.model.p1.player.name
+        p2_name = self.model.p2.player.name
+        self.turn = 0
+        self.target_column = None
+        self.model = GameModel()
+        self.model.p1.player.name = p1_name
+        self.model.p2.player.name = p2_name
+        self.is_save = True
+        self.select_game_state('match')
+        self.create_new_game()
+
+    def select_game_state(self, targe_state: str):
+        """Select a target game state"""
+        for state in self.game_state.keys():
+            self.game_state[state] = False
+        self.game_state[targe_state] = True
 
     def is_game_over(self, current_player):
         """Return True if the Game is Over.
@@ -56,30 +95,24 @@ class GameController:
         In this case We expect False, to know the game is on.
         """
         if not self.model.is_game_over(current_player):
-            self.game_state['menu'] = False
-            self.game_state['match'] = False
-            self.game_state['how_to_play'] = False
-            self.game_state['leader_board'] = False
-            self.game_state['winner'] = True  # <-----------
+            self.select_game_state('winner')
 
     def play(self):
-        # Show leader board before start the game
-
+        # Create new game
+        self.create_new_game()
         # Add Background game
 
         # Define which player starts first
         players = self.model.select_player_start()
         mixer.music.load(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\music\libella_swing.mp3')
-        mixer.music.set_volume(0.3)
+        mixer.music.set_volume(0.0)
         mixer.music.play(-1)
         while self.active_game:
             # Assign player turn and define opponent player in this turn
             current_player = players[self.turn]
             opponent = self.model.select_opponent(players, self.turn)
 
-            # print(current_player.grid)
             # Roll the dice
-
             self.screen.fill('Black')  # To refresh the black screen
             self.screen.blit(self.background_img, self.background_rect)
             for event in pg.event.get():
@@ -92,6 +125,12 @@ class GameController:
 
             if self.game_state['menu']:
                 self.menu.run(self.game_state)
+
+            if self.game_state['how_to_play']:
+                self.how_to_play.run(self.game_state)
+
+            if self.game_state['leader_board']:
+                self.leader_board.run(self.game_state)
 
             # If true Match in display
             if self.game_state['match']:
@@ -125,32 +164,20 @@ class GameController:
 
             if self.game_state['winner']:
                 self.model.select_winner()
-                # self.model.winner_status = 0
                 self.winner_podium.run(self.game_state, self.model.winner_status)
+                if self.is_save:
+                    # Save Game Match
+                    self.model.fill_missing_dice_results(self.model.p1)
+                    self.model.fill_missing_dice_results(self.model.p2)
+                    self.model.save_game_result()
+                    self.model.save_game_grid()
+                    self.is_save = False  # Only this will be re activated if the player retry the game
 
             if self.game_state['retry']:
-                print('que ondaaa!')
-                # p1_name = self.model.p1.player.name
-                # p2_name = self.model.p2.player.name
-                # self.turn = 0
-                # self.target_column = None
-                # self.model = GameModel()
-                # self.model.p1.player.name = p1_name
-                # self.model.p2.player.name = p2_name
-                # self.game_state['menu'] = False
-                # self.game_state['match'] = True  # <----------
-                # self.game_state['how_to_play'] = False
-                # self.game_state['leader_board'] = False
-                # self.game_state['winner'] = False
-                # self.game_state['retry'] = False
+                self.retry_game()
+                players = self.model.select_player_start()
 
             # Update All Game
             pg.display.update()
             # Is Game Over or next player?
             self.clock.tick(self.FPS)
-
-        # Save Game Match
-        self.model.fill_missing_dice_results(self.model.p1)
-        self.model.fill_missing_dice_results(self.model.p2)
-        self.model.save_game_result()
-        self.model.save_game_grid()

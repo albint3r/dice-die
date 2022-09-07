@@ -2,18 +2,17 @@
 import pygame as pg
 from pygame import mixer
 import random
+from config import config
 
 
 class DiceView(pg.sprite.Sprite):
-    DICE_IMG = {1: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\1.png',
-                2: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\2.png',
-                3: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\3.png',
-                4: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\4.png',
-                5: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\5.png',
-                6: r'C:\Users\albin\PycharmProjects\dice_&_die\statics\dice\6.png'}
+    DICE_IMG = {1: config.get('IMG').get('DICE1'),
+                2: config.get('IMG').get('DICE2'),
+                3: config.get('IMG').get('DICE3'),
+                4: config.get('IMG').get('DICE4'),
+                5: config.get('IMG').get('DICE5'),
+                6: config.get('IMG').get('DICE6')}
 
-    RANDOM_ROLLING_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\dice_random_rolling_effect.mp3'
-    DICE_ROLL_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\dice_roll.mp3'
     DICE_SIZE = (150, 150)
     TIME_SOUND_DELAY = 1500  # 0.5 seconds
     TIME_ROLLING = 560
@@ -30,8 +29,8 @@ class DiceView(pg.sprite.Sprite):
             self.rect = self.image.get_rect(center=(190, 230))
         self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # is the time to the next dice img
         self.rolling_duration = self.TIME_ROLLING  # Is the time to throw the dice automatic
-        self.random_rolling_sound = pg.mixer.Sound(self.RANDOM_ROLLING_ROOT)
-        self.roll_sound = pg.mixer.Sound(self.DICE_ROLL_ROOT)
+        self.random_rolling_sound = pg.mixer.Sound(config.get('SOUND').get('RANDOM_ROLLING'))
+        self.roll_sound = pg.mixer.Sound(config.get('SOUND').get('THROW_DICE'))
         self.random_rolling_sound_flag = True  # If True the rolling dice will reproduce one time
 
     def roll_animation(self):

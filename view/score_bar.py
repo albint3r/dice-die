@@ -1,6 +1,7 @@
 # Import
 import pygame as pg
 import datetime as dt
+from config import config
 
 
 class ScoreBarView(pg.sprite.Sprite):
@@ -12,11 +13,6 @@ class ScoreBarView(pg.sprite.Sprite):
     COLOR_GREEN_SHADOW = '#4D8F81'
     BAR_SPEED = 5
     BORDER_RADIUS = 5
-    # FONT_ROOT = r'../statics/font/BebasNeue-Regular.ttf'
-    FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\BebasNeue-Regular.ttf'
-    POINTS_FONT_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\font\Magical Story.ttf'
-    RED_HALO_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\red_halo.png'
-    GREEN_HALO_ROOT = r'C:\Users\albin\PycharmProjects\dice_&_die\statics\green_halo.png'
 
     def __init__(self):
         super().__init__()
@@ -26,14 +22,14 @@ class ScoreBarView(pg.sprite.Sprite):
         self.image = self.original_image
         self.rect = self.image.get_rect(center=(self.X_POS, self.Y_POS))
         self.red_bar_size = 200
-        self.font = pg.font.Font(self.FONT_ROOT, 22)  # Todo ADD FONT TEXT
+        self.font = pg.font.Font(config.get('FONT').get('BEBAS'), 22)  # Todo ADD FONT TEXT
         # Halo
-        self.points_font = pg.font.Font(self.POINTS_FONT_ROOT, 100)
+        self.points_font = pg.font.Font(config.get('FONT').get('MAGIC'), 100)
         # Red
-        self.red_halo_img = pg.transform.scale(pg.image.load(self.RED_HALO_ROOT).convert_alpha(), (200, 200))
+        self.red_halo_img = pg.transform.scale(pg.image.load(config.get('IMG').get('RED_HALO')).convert_alpha(), (200, 200))
         self.red_halo_rect = self.red_halo_img.get_rect(center=(200, 500))
         # Green
-        self.green_halo_img = pg.transform.scale(pg.image.load(self.GREEN_HALO_ROOT).convert_alpha(), (200, 200))
+        self.green_halo_img = pg.transform.scale(pg.image.load(config.get('IMG').get('GREEN_HALO')).convert_alpha(), (200, 200))
         self.green_halo_rect = self.green_halo_img.get_rect(center=(1000, 500))
 
     def set_rounded(self):
