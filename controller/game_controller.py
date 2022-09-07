@@ -28,6 +28,9 @@ class GameController:
 
         # Pygame
         pg.init()
+
+
+    def create_new_game(self):
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(self.screen_size)
         # Menu
@@ -50,6 +53,22 @@ class GameController:
         # Winner Podium
         self.winner_podium = WinnerPodiumView(self.model)
 
+    def retry_game(self):
+        p1_name = self.model.p1.player.name
+        p2_name = self.model.p2.player.name
+        self.turn = 0
+        self.target_column = None
+        self.model = GameModel()
+        self.model.p1.player.name = p1_name
+        self.model.p2.player.name = p2_name
+        self.game_state['menu'] = False
+        self.game_state['match'] = True  # <----------
+        self.game_state['how_to_play'] = False
+        self.game_state['leader_board'] = False
+        self.game_state['winner'] = False
+        self.game_state['retry'] = False
+        self.create_new_game()
+
     def is_game_over(self, current_player):
         """Return True if the Game is Over.
         This method is revers that the method used in the Terminal object.
@@ -63,8 +82,8 @@ class GameController:
             self.game_state['winner'] = True  # <-----------
 
     def play(self):
-        # Show leader board before start the game
-
+        # Create new game
+        self.create_new_game()
         # Add Background game
 
         # Define which player starts first
@@ -130,6 +149,8 @@ class GameController:
 
             if self.game_state['retry']:
                 print('que ondaaa!')
+                self.retry_game()
+                players = self.model.select_player_start()
                 # p1_name = self.model.p1.player.name
                 # p2_name = self.model.p2.player.name
                 # self.turn = 0
