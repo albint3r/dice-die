@@ -28,7 +28,16 @@ class GameController:
 
         # Pygame
         pg.init()
-
+        self.clock = None
+        self.screen = None
+        self.menu = None
+        self.score_bar = None
+        self.score_bar_group = None
+        self.boars_group = None
+        self.dice = None
+        self.background_img = None
+        self.background_rect = None
+        self.winner_podium = None
 
     def create_new_game(self):
         self.clock = pg.time.Clock()
@@ -61,13 +70,14 @@ class GameController:
         self.model = GameModel()
         self.model.p1.player.name = p1_name
         self.model.p2.player.name = p2_name
-        self.game_state['menu'] = False
-        self.game_state['match'] = True  # <----------
-        self.game_state['how_to_play'] = False
-        self.game_state['leader_board'] = False
-        self.game_state['winner'] = False
-        self.game_state['retry'] = False
+        self.select_game_state('match')
         self.create_new_game()
+
+    def select_game_state(self, targe_state: str):
+        """Select a target game state"""
+        for state in self.game_state.keys():
+            self.game_state[state] = False
+        self.game_state[targe_state] = True
 
     def is_game_over(self, current_player):
         """Return True if the Game is Over.
@@ -75,11 +85,8 @@ class GameController:
         In this case We expect False, to know the game is on.
         """
         if not self.model.is_game_over(current_player):
-            self.game_state['menu'] = False
-            self.game_state['match'] = False
-            self.game_state['how_to_play'] = False
-            self.game_state['leader_board'] = False
-            self.game_state['winner'] = True  # <-----------
+            self.select_game_state('winner')
+
 
     def play(self):
         # Create new game
@@ -144,26 +151,12 @@ class GameController:
 
             if self.game_state['winner']:
                 self.model.select_winner()
-                # self.model.winner_status = 0
                 self.winner_podium.run(self.game_state, self.model.winner_status)
 
             if self.game_state['retry']:
                 print('que ondaaa!')
                 self.retry_game()
                 players = self.model.select_player_start()
-                # p1_name = self.model.p1.player.name
-                # p2_name = self.model.p2.player.name
-                # self.turn = 0
-                # self.target_column = None
-                # self.model = GameModel()
-                # self.model.p1.player.name = p1_name
-                # self.model.p2.player.name = p2_name
-                # self.game_state['menu'] = False
-                # self.game_state['match'] = True  # <----------
-                # self.game_state['how_to_play'] = False
-                # self.game_state['leader_board'] = False
-                # self.game_state['winner'] = False
-                # self.game_state['retry'] = False
 
             # Update All Game
             pg.display.update()
