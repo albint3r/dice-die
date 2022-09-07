@@ -28,7 +28,7 @@ pero no los nombres de los jugadores actuales`
 *********************************************************************
 # Tableros
 *********************************************************************
-- Parmitir que el jugador pueda escoger columna con el teclado
+- `Parmitir que el jugador pueda escoger columna con el teclado`
 - `Crear methodo que cree una copia del diccionario grid para poder agregar zeros
 y posteriormente este sirva para mostrar los resultados en el tabler.`
 

@@ -87,7 +87,6 @@ class GameController:
         if not self.model.is_game_over(current_player):
             self.select_game_state('winner')
 
-
     def play(self):
         # Create new game
         self.create_new_game()
