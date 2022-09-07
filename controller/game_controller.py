@@ -11,6 +11,7 @@ from view.dice import DiceView
 from view.menu import MenuView
 from view.winner_podium import WinnerPodiumView
 from view.leader_board import LeaderBoardView
+from view.how_to_play import HowToPlayView
 
 
 class GameController:
@@ -41,6 +42,7 @@ class GameController:
         self.background_img = None
         self.background_rect = None
         self.winner_podium = None
+        self.how_to_play = None
 
     def create_new_game(self):
         self.clock = pg.time.Clock()
@@ -66,6 +68,8 @@ class GameController:
         self.background_rect = self.background_img.get_rect(center=(600, 500))
         # Winner Podium
         self.winner_podium = WinnerPodiumView(self.model)
+        # How to play
+        self.how_to_play = HowToPlayView()
 
     def retry_game(self):
         p1_name = self.model.p1.player.name
@@ -121,6 +125,9 @@ class GameController:
 
             if self.game_state['menu']:
                 self.menu.run(self.game_state)
+
+            if self.game_state['how_to_play']:
+                self.how_to_play.run(self.game_state)
 
             if self.game_state['leader_board']:
                 self.leader_board.run(self.game_state)

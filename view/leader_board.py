@@ -55,19 +55,19 @@ class LeaderBoardTable(pg.sprite.Sprite):
             wins_surf = self.font_board.render(f'{player[1]}', False, 'White')
             wins_rect = wins_surf.get_rect(center=(600, y_pos + height_spaces_players))
             # Win rate
-            win_rate_surf = self.font_board.render(f'{player[2]}', False, 'White')
-            win_rate_rect = win_rate_surf.get_rect(center=(900, y_pos + height_spaces_players))
+            avg_turn_surf = self.font_board.render(f'{player[2]:.0f}', False, 'White')
+            avg_turns_rect = avg_turn_surf.get_rect(center=(900, y_pos + height_spaces_players))
             # Display result
             self.screen.blit(name_surf, name_rect)
             self.screen.blit(wins_surf, wins_rect)
-            self.screen.blit(win_rate_surf, win_rate_rect)
+            self.screen.blit(avg_turn_surf, avg_turns_rect)
             # This adds space between the names
             y_pos = y_pos + height_spaces_players
 
     def show_table_labels(self):
         """Display the name of the top players"""
 
-        labels = ('Name', 'Total Wins', 'Avg. Turn to win')
+        labels = ('Name', 'Total Wins', 'Avg. Turns to win')
         x_pos = (300, 600, 900)
 
         for x, label in zip(x_pos, labels):

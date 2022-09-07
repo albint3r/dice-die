@@ -28,6 +28,8 @@ config = {
             'BITCOIN': os.path.join(basedir, 'statics', 'bitcoin.png'),
             'TROPHY': os.path.join(basedir, 'statics', 'trophy.png'),
             'LOGO': os.path.join(basedir, 'statics', 'logo.png'),
+            'DESTROY_SYSTEM': os.path.join(basedir, 'statics', 'how_to_play', 'destroy_dices.png'),
+            'POINTS_SYSTEM': os.path.join(basedir, 'statics', 'how_to_play', 'points_system.png'),
             },
     # Music
     'MUSIC': {'SLASH': os.path.join(basedir, 'statics', 'sound', 'slash1_sound.mp3')},
