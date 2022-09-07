@@ -115,6 +115,7 @@ class ButtonView(pg.sprite.Sprite):
         # Sound
         self.sound = pg.mixer.Sound(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\sound\piano_key.WAV')
         self.is_sound = False
+        self.is_click = False
 
     def set_button_color(self):
         self.image = pg.transform.scale(pg.image.load(self.button_type[self.img_index]).convert_alpha(), self.SIZE)
@@ -122,24 +123,53 @@ class ButtonView(pg.sprite.Sprite):
     def show_text(self):
         self.screen.blit(self.text, self.text_rect)
 
-    def press_button(self, game_state):
+    def press_button(self, game_state, GameController=None):
         mouse = pg.mouse.get_pressed()
 
-        if self.rect.collidepoint(pg.mouse.get_pos()):  # This helps in the hover effect
+        if self.rect.collidepoint(pg.mouse.get_pos()):
+            # Change the index to have green o red color if hover on the button
+            self.img_index = 0
+            # This helps in the hover effect
             if self.is_sound:
                 self.sound.play()
                 self.is_sound = False
 
-            self.img_index = 0
-            if mouse[0]:  # If right click do any of the actions below
+            if mouse[0] and not self.is_click:  # If right click do any of the actions below
+                self.is_click = True
                 match self.btn_name:
                     case 'start new game':
                         game_state['menu'] = False
-                        game_state['match'] = True
+                        game_state['match'] = True  # <----------
+                        game_state['how_to_play'] = False
+                        game_state['leader_board'] = False
+                        game_state['winner'] = False
+                        game_state['retry'] = False
+
                     case 'how to play?':
                         print('click how to')
+
                     case 'leader board':
                         print('click leader board')
+
+                    case 'back to menu':
+                        game_state['menu'] = True  # <----------
+                        game_state['match'] = False
+                        game_state['how_to_play'] = False
+                        game_state['leader_board'] = False
+                        game_state['winner'] = False
+                        game_state['retry'] = False
+
+                    case 'retry':
+                        game_state['menu'] = False
+                        game_state['match'] = False
+                        game_state['how_to_play'] = False
+                        game_state['leader_board'] = False
+                        game_state['winner'] = False
+                        game_state['retry'] = True  # <----------
+
+            # This helps to only register one click
+            elif not mouse[0] and self.is_click:
+                self.is_click = False
 
         else:
             self.img_index = 1
