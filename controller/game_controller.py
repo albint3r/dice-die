@@ -10,6 +10,7 @@ from view.board import BoarGameView
 from view.dice import DiceView
 from view.menu import MenuView
 from view.winner_podium import WinnerPodiumView
+from view.leader_board import LeaderBoardView
 
 
 class GameController:
@@ -22,12 +23,13 @@ class GameController:
         self.screen_size: tuple[int, int] = (1200, 1000)
         self.FPS: int = 60
         self.active_game: bool = True
-        self.game_state: dict = dict(menu=True, how_to_play=False,
-                                     leader_board=False, match=False,
+        self.game_state: dict = dict(menu=False, how_to_play=False,
+                                     leader_board=True, match=False,
                                      winner=False, retry=False)
 
         # Pygame
         pg.init()
+        self.leader_board = None
         self.clock = None
         self.screen = None
         self.menu = None
@@ -44,6 +46,8 @@ class GameController:
         self.screen = pg.display.set_mode(self.screen_size)
         # Menu
         self.menu = MenuView()
+        # Leader board
+        self.leader_board = LeaderBoardView(self.model.score_match)
         # Score Bar
         self.score_bar = ScoreBarView()  # Create Round corners
         self.score_bar_group = pg.sprite.GroupSingle(self.score_bar)
@@ -117,6 +121,9 @@ class GameController:
 
             if self.game_state['menu']:
                 self.menu.run(self.game_state)
+
+            if self.game_state['leader_board']:
+                self.leader_board.run()
 
             # If true Match in display
             if self.game_state['match']:

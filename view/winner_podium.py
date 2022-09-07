@@ -32,8 +32,8 @@ class WinnerPodiumView:
             self.winner = self.model.p2
             self.loser = self.model.p1
         if winner_status == 2 and self.winner is None:  # Tie
-            self.winner = None
-            self.loser = None
+            self.winner = self.model.p1
+            self.loser = self.model.p2
             self.is_tie = True
 
     def set_game_result(self):
@@ -67,7 +67,10 @@ class WinnerPodiumView:
     def show_player_winner_name_in_trophy(self):
         # Winner
         font = pg.font.Font(self.FONT_ROOT, 25)
-        winner_name = font.render(f'{self.winner.player.name}', False, 'Black')
+        if not self.is_tie:
+            winner_name = font.render(f'{self.winner.player.name}', False, 'Black')
+        else:
+            winner_name = font.render(f'NO WINNER', False, 'Black')
         winner_name_rect = winner_name.get_rect(center=(600, 345))
         # Show
         self.screen.blit(winner_name, winner_name_rect)
