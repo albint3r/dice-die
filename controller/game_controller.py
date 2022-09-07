@@ -96,7 +96,7 @@ class GameController:
         # Define which player starts first
         players = self.model.select_player_start()
         mixer.music.load(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\music\libella_swing.mp3')
-        mixer.music.set_volume(0.3)
+        mixer.music.set_volume(0.0)
         mixer.music.play(-1)
         while self.active_game:
             # Assign player turn and define opponent player in this turn

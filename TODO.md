@@ -1,10 +1,12 @@
 *********************************************************************
 # Winner Area
 *********************************************************************
-- Agrega podium de ganadores
-- Arreglar el metodo Is game over?
-- Agregar Boton de Retry o play again que resete el juego
-pero no los nombres de los jugadores actuales
+- `Agrega podium de ganadores`
+- `Arreglar el metodo Is game over?`
+- `Agregar Boton de Retry o play again que resete el juego
+pero no los nombres de los jugadores actuales`
+- Resolver que se resetie el tiempo al empezar un RETRY
+- Aun no guarda bien las partidas
 *********************************************************************
 # Leader Board
 *********************************************************************
@@ -26,6 +28,7 @@ pero no los nombres de los jugadores actuales
 *********************************************************************
 # Tableros
 *********************************************************************
+- Parmitir que el jugador pueda escoger columna con el teclado
 - `Crear methodo que cree una copia del diccionario grid para poder agregar zeros
 y posteriormente este sirva para mostrar los resultados en el tabler.`
 
