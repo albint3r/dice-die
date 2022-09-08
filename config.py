@@ -32,7 +32,9 @@ config = {
             'POINTS_SYSTEM': os.path.join(basedir, 'statics', 'how_to_play', 'points_system.png'),
             },
     # Music
-    'MUSIC': {'SLASH': os.path.join(basedir, 'statics', 'sound', 'slash1_sound.mp3')},
+    'MUSIC': {'TRACK1': os.path.join(basedir, 'statics', 'music', 'libella_swing.mp3'),
+              'TRACK2': os.path.join(basedir, 'statics', 'music', 'booty_ swing.mp3'),
+              },
     # Sounds
     'SOUND': {'SLASH': os.path.join(basedir, 'statics', 'sound', 'slash1_sound.mp3'),
               'RANDOM_ROLLING': os.path.join(basedir, 'statics', 'sound', 'dice_random_rolling_effect.mp3'),

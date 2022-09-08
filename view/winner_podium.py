@@ -21,7 +21,7 @@ class WinnerPodiumView:
         # Buttons
         self.menu = pg.sprite.Group()
         self.menu.add(ButtonView(400, 910, 'retry'))
-        self.menu.add(ButtonView(800, 910, 'back to menu'))
+        self.menu.add(ButtonView(800, 910, 'back to menu', btn_name='retry_back'))
 
     def set_player_places(self, winner_status):
         """Set the players places on the match"""

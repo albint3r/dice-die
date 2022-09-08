@@ -46,7 +46,7 @@ class LeaderBoardTable(pg.sprite.Sprite):
         """Display the name of the top players"""
         top_player = self.score_match.get_leader_score()
         y_pos = 280
-        height_spaces_players = 50  # The count start in 0
+        height_spaces_players = 50  # The count start in 03
         for player in top_player:
             # Name
             name_surf = self.font_board.render(f'{player[0]}', False, 'White')

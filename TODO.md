@@ -1,4 +1,11 @@
 *********************************************************************
+# Text Fill Player
+*********************************************************************
+- Agregar Area previa a la partida para que el usuario pueda agregar su nombre de jugador
+con el teclado
+
+
+*********************************************************************
 # Winner Area
 *********************************************************************
 - `Agrega podium de ganadores`
@@ -6,18 +13,19 @@
 - `Agregar Boton de Retry o play again que resete el juego
 pero no los nombres de los jugadores actuales`
 - Resolver que se resetie el tiempo al empezar un RETRY
-- Aun no guarda bien las partidas
+- Resolver que se resetie los valores y el usuario pueda hacer back to menu
+- `Aun no guarda bien las partidas`
 *********************************************************************
 # Leader Board
 *********************************************************************
-- Agregar Tabla de los 10 mejores jugadores
-- Agregar Boton 'Back' para regresar al menu de inicio
+- `Agregar Tabla de los 10 mejores jugadores`
+- `Agregar Boton 'Back' para regresar al menu de inicio`
 
 *********************************************************************
 # How to play
 *********************************************************************
-- Agregar 3 imagenes descriptivas de como se juega el juego
-- Agrega boton de 'Back' para regresar al menu de inicio
+- `Agregar 3 imagenes descriptivas de como se juega el juego`
+- `Agrega boton de 'Back' para regresar al menu de inicio`
 *********************************************************************
 # Score Bar
 *********************************************************************
