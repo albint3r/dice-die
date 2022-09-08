@@ -141,8 +141,11 @@ class ButtonView(pg.sprite.Sprite):
             if mouse[0] and not self.is_click:  # If right click do any of the actions below
                 self.is_click = True
                 match self.btn_name:
-                    case 'start new game':
+                    case 'match':  # After input names
                         self.select_game_state(game_state, 'match')
+
+                    case 'start new game':
+                        self.select_game_state(game_state, 'player_input')
 
                     case 'how to play?':
                         self.select_game_state(game_state, 'how_to_play')

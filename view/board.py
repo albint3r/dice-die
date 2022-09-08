@@ -268,7 +268,6 @@ class BoarGameView(pg.sprite.Sprite):
         """Add the dice to the selected column"""
         if self.player.is_turn and self.target_column:
             self.player.add(self.target_column, self.player.dice.number)
-            print('grid', self.player.grid, self.player.player.name)
 
     def add_broken(self):
         """Create a broken objet to display in front of the board to create the ilution of damage"""
@@ -335,7 +334,6 @@ class BoarGameView(pg.sprite.Sprite):
         if self.player.is_turn and self.target_column:
             self.player.points_board.update_column_points(self.player.grid, self.target_column)
             self.player.points_board.update_total_score()
-            print('Points', self.player.points_board.points, self.player.player.name)
 
     def update_opponent_game(self, opponent):
         """Update the game of the opponent player."""
@@ -349,8 +347,6 @@ class BoarGameView(pg.sprite.Sprite):
             self.target_column = None
             self.player.is_turn = False
             opponent.is_turn = True
-            print('current_player', self.player.player.name)
-            print('opponent', opponent.player.name)
             # This make a call back to update the Turns in the game.
             func_update_total_score()
 

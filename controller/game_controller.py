@@ -1,4 +1,6 @@
 # Import
+import random
+
 import pygame as pg
 from pygame import mixer
 import sys
@@ -12,6 +14,9 @@ from view.menu import MenuView
 from view.winner_podium import WinnerPodiumView
 from view.leader_board import LeaderBoardView
 from view.how_to_play import HowToPlayView
+from view.player_name_input import PlayerNameTextInput
+# config
+from config import config
 
 
 class GameController:
@@ -24,8 +29,8 @@ class GameController:
         self.screen_size: tuple[int, int] = (1200, 1000)
         self.FPS: int = 60
         self.active_game: bool = True
-        self.game_state: dict = dict(menu=True, how_to_play=False,
-                                     leader_board=False, match=False,
+        self.game_state: dict = dict(menu=True, how_to_play=False, leader_board=False,
+                                     match=False, player_input=False,
                                      winner=False, retry=False, retry_back=False)
         self.is_save: bool = True
 
@@ -43,6 +48,7 @@ class GameController:
         self.background_rect = None
         self.winner_podium = None
         self.how_to_play = None
+        self.player_text_input = None
 
     def create_new_game(self):
         self.clock = pg.time.Clock()
@@ -70,6 +76,8 @@ class GameController:
         self.winner_podium = WinnerPodiumView(self.model)
         # How to play
         self.how_to_play = HowToPlayView()
+        # Player text input
+        self.player_text_input = PlayerNameTextInput(self.model.p1, self.model.p2)
 
     def retry_game(self):
         p1_name = self.model.p1.player.name
@@ -117,8 +125,8 @@ class GameController:
 
         # Define which player starts first
         players = self.model.select_player_start()
-        mixer.music.load(r'C:\Users\albin\PycharmProjects\dice_&_die\statics\music\libella_swing.mp3')
-        mixer.music.set_volume(0.0)
+        mixer.music.load(config.get('MUSIC').get(random.choice(['TRACK1', 'TRACK2'])))
+        mixer.music.set_volume(0.4)
         mixer.music.play(-1)
         while self.active_game:
             # Assign player turn and define opponent player in this turn
@@ -128,6 +136,7 @@ class GameController:
             # Roll the dice
             self.screen.fill('Black')  # To refresh the black screen
             self.screen.blit(self.background_img, self.background_rect)
+            # Events
             for event in pg.event.get():
                 # If player click cross exit game
                 if event.type == pg.QUIT:
@@ -144,6 +153,10 @@ class GameController:
 
             if self.game_state['leader_board']:
                 self.leader_board.run(self.game_state)
+
+            # Players had name?
+            if self.game_state['player_input']:
+                self.player_text_input.run(self.game_state)
 
             # If true Match in display
             if self.game_state['match']:

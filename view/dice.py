@@ -55,7 +55,6 @@ class DiceView(pg.sprite.Sprite):
                 self.player.dice.roll()
                 self.random_rolling_sound.stop()
                 self.roll_sound.play()
-                print(f'Resultado {self.player.dice.number}', self.player.player.name)
                 self.random_rolling_sound_flag = True  # Turn on this flag for the next turn apply the effect
                 self.rolling_duration = self.TIME_ROLLING  # Reset Timer Random Rolling Sound effect
                 self.animation_random_rolling_duration = self.TIME_FLIP_DICE  # Reset Animation Duration
