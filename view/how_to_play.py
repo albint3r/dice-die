@@ -44,8 +44,10 @@ class PointsSystem(pg.sprite.Sprite):
     def show_body_text(self):
         """Show the title of the point system section"""
         paragraph = [
-            'Each Turn you roll the dice and put the result in one of the three columns on your board. If you have only one type of number in that column,',
-            'the value of the number will be multiply by 1, but if you add more numbers of the same value, you multiply x2 or x3. ']
+            'Each Turn you roll the dice and put the result in one of the three columns on your board. If you have '
+            'only one type of number in that column,',
+            'the value of the number will be multiply by 1, but if you add more numbers of the same value, '
+            'you multiply x2 or x3. ']
 
         start_pos = 60
         height = 50
@@ -80,7 +82,8 @@ class DestroySystem(pg.sprite.Sprite):
     def show_body_text(self):
         """Show the title of the point system section"""
         paragraph = [
-            'When you roll the dice, you select a target column, if the other player have the same value inside the same column, it will destroy it all the numbers',
+            'When you roll the dice, you select a target column, if the other player have the same value inside the '
+            'same column, it will destroy it all the numbers',
             'with the same value.']
 
         start_pos = 460

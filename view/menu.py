@@ -97,14 +97,14 @@ class FallingObjectsView(pg.sprite.Sprite):
 class ButtonView(pg.sprite.Sprite):
     SIZE = (400, 200)
 
-    def __init__(self, x: float, y: float, text: str):
+    def __init__(self, x: float, y: float, text: str, btn_name:str = None):
         super().__init__()
         self.button_type = (config.get('IMG').get('GREEN_BTN'),
                             config.get('IMG').get('RED_BTN'))
 
         self.screen = pg.display.get_surface()
         self.img_index = 1
-        self.btn_name = text.lower()
+        self.btn_name = text.lower() if btn_name is None else btn_name
         self.image = pg.transform.scale(pg.image.load(self.button_type[self.img_index]).convert_alpha(), self.SIZE)
         self.rect = self.image.get_rect(center=(x, y))
         # Font text
@@ -155,6 +155,9 @@ class ButtonView(pg.sprite.Sprite):
 
                     case 'retry':
                         self.select_game_state(game_state, 'retry')
+
+                    case 'retry_back':
+                        self.select_game_state(game_state, 'retry_back')
 
             # This helps to only register one click
             elif not mouse[0] and self.is_click:

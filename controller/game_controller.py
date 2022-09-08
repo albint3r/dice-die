@@ -26,7 +26,7 @@ class GameController:
         self.active_game: bool = True
         self.game_state: dict = dict(menu=True, how_to_play=False,
                                      leader_board=False, match=False,
-                                     winner=False, retry=False)
+                                     winner=False, retry=False, retry_back=False)
         self.is_save: bool = True
 
         # Pygame
@@ -79,8 +79,21 @@ class GameController:
         self.model = GameModel()
         self.model.p1.player.name = p1_name
         self.model.p2.player.name = p2_name
-        self.is_save = True
+        self.is_save = True  # This must be true to save the next match result
         self.select_game_state('match')
+        self.create_new_game()
+
+    def retry_back_game(self):
+        """Create the game again but instead of replay the game it would send you to the main menu"""
+        p1_name = self.model.p1.player.name
+        p2_name = self.model.p2.player.name
+        self.turn = 0
+        self.target_column = None
+        self.model = GameModel()
+        self.model.p1.player.name = p1_name
+        self.model.p2.player.name = p2_name
+        self.is_save = True  # This must be true to save the next match result
+        self.select_game_state('menu')
         self.create_new_game()
 
     def select_game_state(self, targe_state: str):
@@ -171,10 +184,16 @@ class GameController:
                     self.model.fill_missing_dice_results(self.model.p2)
                     self.model.save_game_result()
                     self.model.save_game_grid()
-                    self.is_save = False  # Only this will be re activated if the player retry the game
+                    self.is_save = False  # Only this will be re-activated if the player retry the game
 
             if self.game_state['retry']:
                 self.retry_game()
+                players = self.model.select_player_start()
+
+            if self.game_state['retry_back']:
+                # This game state help to restart all the game settings and return the player
+                # to the main menu instead of replay the game
+                self.retry_back_game()
                 players = self.model.select_player_start()
 
             # Update All Game
