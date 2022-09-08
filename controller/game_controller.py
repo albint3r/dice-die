@@ -36,6 +36,8 @@ class GameController:
 
         # Pygame
         pg.init()
+        pg.display.set_caption('Dice and Die Classic')
+        pg.display.set_icon(pg.image.load(config.get('IMG').get('DICE6')))
         self.leader_board = None
         self.clock = None
         self.screen = None
